@@ -56,3 +56,49 @@ body {
 .login-box button[type="button"] {
     background-color: #ddd;
 }
+
+/*------ Menu Bar ----*/
+
+.menu-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1976d2;
+    color: white;
+    padding: 15px 25px;
+}
+
+.menu-bar h2 {
+    margin: 0;
+}
+
+.menu-links {
+    display: flex;
+    gap: 10px;
+}
+
+.menu-links button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: white;
+    color: #1976d2;
+}
+
+.menu-links button:hover {
+    background-color: #e3f2fd;
+}
+
+.home-content {
+    text-align: center;
+    margin-top: 150px;
+}
+
+.home-content h1 {
+    margin-bottom: 20px;
+}
+
+.home-content h3 {
+    font-weight: normal;
+}
