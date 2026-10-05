@@ -9,6 +9,7 @@ function MenuBar() {
                 <button>Support</button>
                 <button>Tickets</button>
                 <button>Reports</button>
+                <button>Logout</button>
             </div>
 
         </div>
