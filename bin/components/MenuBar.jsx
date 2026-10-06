@@ -1,30 +1,15 @@
-import { useNavigate } from "react-router-dom";
-
 function MenuBar() {
-
-    const navigate = useNavigate();
-
     return (
         <div className="menu-bar">
 
             <h2>Support Management System</h2>
 
             <div className="menu-links">
-
-                <button onClick={() => navigate("/")}>
-                    Home
-                </button>
-
-                <button onClick={() => navigate("/support")}>
-                    Support
-                </button>
-
+                <button>Home</button>
+                <button>Support</button>
                 <button>Tickets</button>
-
                 <button>Reports</button>
-
                 <button>Logout</button>
-
             </div>
 
         </div>
