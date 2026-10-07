@@ -1,46 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./Support.css";
 
 function Support() {
 
-    const navigate = useNavigate();
+    // =====================================================
+    // OPTIONS
+    // =====================================================
 
-    const [activeMenu, setActiveMenu] = useState("add");
-
-    const [users, setUsers] = useState([]);
-
-    const [name, setName] = useState("");
-    const [contact, setContact] = useState("");
-    const [email, setEmail] = useState("");
-    const [technology, setTechnology] = useState("");
-    const [timeZone, setTimeZone] = useState("");
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
-
-    const [showTimePicker, setShowTimePicker] = useState(false);
-
-    const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState("");
-
-    const [deleteUser, setDeleteUser] = useState(null);
-
-    const [editUser, setEditUser] = useState(null);
-
-    // OTP states
-    const [showOtp, setShowOtp] = useState(false);
-    const [otp, setOtp] = useState("");
-    const [otpError, setOtpError] = useState("");
-    const [otpSent, setOtpSent] = useState(false);
-
-    // Success screen
-    const [showSuccess, setShowSuccess] = useState(false);
-
-    // User details
-    const [selectedUser, setSelectedUser] = useState(null);
-
-
-    const technologies = [
+    const defaultTechnologies = [
         "Java",
         "Python",
         "Gen AI",
@@ -51,758 +18,1821 @@ function Support() {
         "Cloud Computing"
     ];
 
-    const timeZones = [
-        "IST",
-        "EST",
-        "CST",
-        "MST",
-        "PST",
-        "GMT",
-        "CET",
-        "AEST"
+    const amountOptions = [
+        "10000",
+        "20000",
+        "30000",
+        "40000"
     ];
 
+    const countryCodes = [
+        "+91",
+        "+1"
+    ];
 
-    // Generate 30-minute intervals
-    const generateTimeOptions = () => {
+    // =====================================================
+    // COMMON
+    // =====================================================
 
-        const times = [];
+    const [activeMenu, setActiveMenu] = useState("home");
 
-        for (let hour = 0; hour < 24; hour++) {
+    const [successMessage, setSuccessMessage] =
+        useState("");
 
-            for (let minute = 0; minute < 60; minute += 30) {
+    // =====================================================
+    // TECHNOLOGY
+    // =====================================================
 
-                const value =
-                    String(hour).padStart(2, "0") +
-                    ":" +
-                    String(minute).padStart(2, "0");
+    const [technologies, setTechnologies] =
+        useState(defaultTechnologies);
 
-                const displayHour =
-                    hour === 0
-                        ? 12
-                        : hour > 12
-                            ? hour - 12
-                            : hour;
+    // =====================================================
+    // USERS
+    // =====================================================
 
-                const period = hour >= 12 ? "PM" : "AM";
+    const [users, setUsers] = useState([]);
 
-                const display =
-                    String(displayHour).padStart(2, "0") +
-                    ":" +
-                    String(minute).padStart(2, "0") +
-                    " " +
-                    period;
+    const [nextUserNumber, setNextUserNumber] =
+        useState(1);
 
-                times.push({
-                    value,
-                    display
-                });
-            }
-        }
+    const [name, setName] = useState("");
 
-        return times;
+    const [userType, setUserType] =
+        useState("");
+
+    const [countryCode, setCountryCode] =
+        useState("+91");
+
+    const [contact, setContact] =
+        useState("");
+
+    const [email, setEmail] =
+        useState("");
+
+    const [technology, setTechnology] =
+        useState([]);
+
+    const [customTechnology, setCustomTechnology] =
+        useState("");
+
+    const [selectedUserId, setSelectedUserId] =
+        useState(null);
+
+    const [searchUser, setSearchUser] =
+        useState("");
+
+    const [editUserId, setEditUserId] =
+        useState(null);
+
+    const [viewUser, setViewUser] =
+        useState(null);
+
+    const [deleteUser, setDeleteUser] =
+        useState(null);
+
+    // =====================================================
+    // SUPPORT
+    // =====================================================
+
+    const [supports, setSupports] =
+        useState([]);
+
+    const [supportClient, setSupportClient] =
+        useState("");
+
+    const [assignedSupportUser, setAssignedSupportUser] =
+        useState("");
+
+    const [supportStartDate, setSupportStartDate] =
+        useState("");
+
+    const [supportEndDate, setSupportEndDate] =
+        useState("");
+
+    // Customer agreed amount
+    const [agreedAmount, setAgreedAmount] =
+        useState("");
+
+    const [customAgreedAmount, setCustomAgreedAmount] =
+        useState("");
+
+    // Support person's agreed amount
+    const [supportAgreedAmount, setSupportAgreedAmount] =
+        useState("");
+
+    const [
+        customSupportAgreedAmount,
+        setCustomSupportAgreedAmount
+    ] = useState("");
+
+    const [selectedSupportId, setSelectedSupportId] =
+        useState(null);
+
+    const [highlightedSupportId, setHighlightedSupportId] =
+        useState(null);
+
+    const [searchSupport, setSearchSupport] =
+        useState("");
+
+    const [editSupportId, setEditSupportId] =
+        useState(null);
+
+    const [deleteSupport, setDeleteSupport] =
+        useState(null);
+
+    // =====================================================
+    // PAYMENT HISTORY
+    // =====================================================
+
+    const [payments, setPayments] =
+        useState([]);
+
+    const [historySupport, setHistorySupport] =
+        useState(null);
+
+    const [paymentAmountReceived, setPaymentAmountReceived] =
+        useState("");
+
+    const [paymentReceivedDate, setPaymentReceivedDate] =
+        useState("");
+
+    const [paymentAmountPaid, setPaymentAmountPaid] =
+        useState("");
+
+    const [paymentPaidDate, setPaymentPaidDate] =
+        useState("");
+
+    const [paymentComments, setPaymentComments] =
+        useState("");
+
+    // =====================================================
+    // USER ID
+    // =====================================================
+
+    const generateUserId = () => {
+
+        return `USR-${String(
+            nextUserNumber
+        ).padStart(3, "0")}`;
     };
 
+    // =====================================================
+    // SUPPORT ID
+    // =====================================================
 
-    const timeOptions = generateTimeOptions();
+    const generateSupportId = () => {
 
-
-    const getDisplayTime = (time) => {
-
-        if (!time) {
-            return "";
+        if (supports.length === 0) {
+            return "001";
         }
 
-        const [hour, minute] = time.split(":");
-
-        const hourNumber = Number(hour);
-
-        const displayHour =
-            hourNumber === 0
-                ? 12
-                : hourNumber > 12
-                    ? hourNumber - 12
-                    : hourNumber;
-
-        const period = hourNumber >= 12 ? "PM" : "AM";
-
-        return (
-            String(displayHour).padStart(2, "0") +
-            ":" +
-            minute +
-            " " +
-            period
+        const numbers = supports.map(
+            support => Number(support.id)
         );
+
+        return String(
+            Math.max(...numbers) + 1
+        ).padStart(3, "0");
     };
 
-
-    const selectStartTime = (time) => {
-
-        setStartTime(time);
-
-        if (endTime && endTime <= time) {
-            setEndTime("");
-        }
-    };
-
-
-    const selectEndTime = (time) => {
-
-        if (!startTime) {
-            return;
-        }
-
-        if (time <= startTime) {
-            return;
-        }
-
-        setEndTime(time);
-
-        setTimeout(() => {
-            setShowTimePicker(false);
-        }, 150);
-    };
-
-
-    const validateForm = () => {
-
-        const newErrors = {};
-
-        if (!name.trim()) {
-            newErrors.name = "Name is required";
-        }
-        else if (name.trim().length < 3) {
-            newErrors.name =
-                "Name must contain at least 3 characters";
-        }
-        else if (name.trim().length > 50) {
-            newErrors.name =
-                "Name cannot exceed 50 characters";
-        }
-
-        if (!contact.trim()) {
-            newErrors.contact =
-                "Contact number is required";
-        }
-        else if (!/^\d{10}$/.test(contact)) {
-            newErrors.contact =
-                "Contact number must contain exactly 10 digits";
-        }
-
-        if (!email.trim()) {
-            newErrors.email =
-                "Email is required";
-        }
-        else if (
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ) {
-            newErrors.email =
-                "Enter a valid email address";
-        }
-
-        if (!technology) {
-            newErrors.technology =
-                "Please select technology";
-        }
-
-        if (!timeZone) {
-            newErrors.timeZone =
-                "Please select time zone";
-        }
-
-        if (!startTime || !endTime) {
-            newErrors.supportTime =
-                "Please select support time";
-        }
-
-        if (
-            startTime &&
-            endTime &&
-            endTime <= startTime
-        ) {
-            newErrors.supportTime =
-                "End time must be after start time";
-        }
-
-        setErrors(newErrors);
-
-        return Object.keys(newErrors).length === 0;
-    };
-
-
-    const clearForm = () => {
-
-        setName("");
-        setContact("");
-        setEmail("");
-        setTechnology("");
-        setTimeZone("");
-        setStartTime("");
-        setEndTime("");
-
-        setErrors({});
-
-        setEditUser(null);
-    };
-
-
-    /*
-     * ADD / UPDATE BUTTON
-     *
-     * Important:
-     * We DO NOT directly add the user.
-     * First we open OTP verification.
-     */
-
-    const handleSubmit = (e) => {
-
-        e.preventDefault();
-
-        if (!validateForm()) {
-            return;
-        }
-
-        setOtp("");
-        setOtpError("");
-        setOtpSent(true);
-
-        setShowOtp(true);
-    };
-
-
-    /*
-     * OTP VERIFICATION
-     *
-     * Currently demo OTP = 123456
-     *
-     * Later this will call Spring Boot API.
-     */
-
-    const verifyOtp = () => {
-
-        if (otp.length !== 6) {
-
-            setOtpError(
-                "Please enter the 6-digit OTP"
-            );
-
-            return;
-        }
-
-
-        // DEMO OTP
-        if (otp !== "123456") {
-
-            setOtpError(
-                "Invalid OTP. Please try again."
-            );
-
-            return;
-        }
-
-
-        // OTP successful
-
-        const enrollmentDate =
-            new Date().toLocaleDateString("en-IN");
-
-
-        if (editUser) {
-
-            const updatedUser = {
-                ...editUser,
-
-                name: name.trim(),
-
-                contact,
-
-                email,
-
-                technology,
-
-                timeZone,
-
-                startTime,
-
-                endTime
-            };
-
-            setUsers(
-                users.map(user =>
-                    user.id === editUser.id
-                        ? updatedUser
-                        : user
-                )
-            );
-
-        } else {
-
-            const newUser = {
-
-                id:
-                    "USR-" +
-                    String(Date.now()).slice(-6),
-
-                name: name.trim(),
-
-                contact,
-
-                email,
-
-                technology,
-
-                timeZone,
-
-                startTime,
-
-                endTime,
-
-                enrollmentDate
-            };
-
-            setUsers([
-                ...users,
-                newUser
-            ]);
-        }
-
-
-        setShowOtp(false);
-
-        setOtp("");
-
-        setOtpError("");
-
-        setOtpSent(false);
-
-        setShowSuccess(true);
-
-        clearForm();
-    };
-
-
-    const resendOtp = () => {
-
-        setOtp("");
-
-        setOtpError("");
-
-        setOtpSent(true);
-
-        /*
-         * Later:
-         * Call Spring Boot API here
-         * to send a real OTP.
-         */
-    };
-
-
-    const handleDone = () => {
-
-        setShowSuccess(false);
-
-        setActiveMenu("view");
-    };
-
-
-    const handleEdit = (user) => {
-
-        setEditUser(user);
-
-        setName(user.name);
-        setContact(user.contact);
-        setEmail(user.email);
-        setTechnology(user.technology);
-        setTimeZone(user.timeZone);
-        setStartTime(user.startTime);
-        setEndTime(user.endTime);
-
-        setErrors({});
-
-        setActiveMenu("add");
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
+    // =====================================================
+    // DATE TIME
+    // =====================================================
+
+    const getRegisteredDateTime = () => {
+
+        const now = new Date();
+
+        return now.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
         });
     };
 
+    // =====================================================
+    // SUCCESS
+    // =====================================================
 
-    const confirmDelete = () => {
+    const showSuccess = (message) => {
+
+        setSuccessMessage(message);
+
+        setTimeout(() => {
+            setSuccessMessage("");
+        }, 2500);
+    };
+
+    // =====================================================
+    // TECHNOLOGY
+    // =====================================================
+
+    const handleTechnologyChange = (e) => {
+
+        const value = e.target.value;
+
+        if (!value) {
+            return;
+        }
+
+        if (!technology.includes(value)) {
+
+            setTechnology([
+                ...technology,
+                value
+            ]);
+        }
+    };
+
+    const addCustomTechnology = () => {
+
+        const value =
+            customTechnology.trim();
+
+        if (!value) {
+            return;
+        }
+
+        if (!technologies.includes(value)) {
+
+            setTechnologies([
+                ...technologies,
+                value
+            ]);
+        }
+
+        if (!technology.includes(value)) {
+
+            setTechnology([
+                ...technology,
+                value
+            ]);
+        }
+
+        setCustomTechnology("");
+    };
+
+    const removeTechnology = (item) => {
+
+        setTechnology(
+            technology.filter(
+                tech => tech !== item
+            )
+        );
+    };
+
+    // =====================================================
+    // USER VALIDATION
+    // =====================================================
+
+    const validateUser = () => {
+
+        if (
+            name.trim().length < 3 ||
+            name.trim().length > 50
+        ) {
+
+            alert(
+                "Name must be between 3 and 50 characters."
+            );
+
+            return false;
+        }
+
+        if (!userType) {
+
+            alert(
+                "Please select User Type."
+            );
+
+            return false;
+        }
+
+        if (!/^\d{10}$/.test(contact)) {
+
+            alert(
+                "Contact number must contain exactly 10 digits."
+            );
+
+            return false;
+        }
+
+        if (
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        ) {
+
+            alert(
+                "Please enter a valid email address."
+            );
+
+            return false;
+        }
+
+        if (technology.length === 0) {
+
+            alert(
+                "Please select at least one technology."
+            );
+
+            return false;
+        }
+
+        return true;
+    };
+
+    // =====================================================
+    // CLEAR USER
+    // =====================================================
+
+    const clearUserForm = () => {
+
+        setName("");
+        setUserType("");
+        setCountryCode("+91");
+        setContact("");
+        setEmail("");
+        setTechnology([]);
+        setCustomTechnology("");
+        setEditUserId(null);
+    };
+
+    // =====================================================
+    // ADD USER
+    // =====================================================
+
+    const handleAddUser = (e) => {
+
+        e.preventDefault();
+
+        if (!validateUser()) {
+            return;
+        }
+
+        const newUser = {
+
+            id: generateUserId(),
+
+            name: name.trim(),
+
+            type: userType,
+
+            countryCode,
+
+            contact,
+
+            email: email.trim(),
+
+            technology: [
+                ...technology
+            ],
+
+            registeredDate:
+                getRegisteredDateTime()
+        };
+
+        setUsers([
+            ...users,
+            newUser
+        ]);
+
+        setNextUserNumber(
+            nextUserNumber + 1
+        );
+
+        clearUserForm();
+
+        setActiveMenu("viewUsers");
+
+        showSuccess(
+            "User added successfully."
+        );
+    };
+
+    // =====================================================
+    // USER ROW
+    // =====================================================
+
+    const handleUserRowClick = (user) => {
+
+        if (
+            selectedUserId === user.id
+        ) {
+
+            setSelectedUserId(null);
+
+        } else {
+
+            setSelectedUserId(user.id);
+        }
+    };
+
+    // =====================================================
+    // EDIT USER
+    // =====================================================
+
+    const editUserRecord = (user) => {
+
+        setName(user.name);
+
+        setUserType(user.type);
+
+        setCountryCode(
+            user.countryCode || "+91"
+        );
+
+        setContact(user.contact);
+
+        setEmail(user.email);
+
+        setTechnology(
+            Array.isArray(user.technology)
+                ? user.technology
+                : []
+        );
+
+        setEditUserId(user.id);
+
+        setSelectedUserId(null);
+
+        setActiveMenu("addUser");
+    };
+
+    // =====================================================
+    // UPDATE USER
+    // =====================================================
+
+    const handleUpdateUser = (e) => {
+
+        e.preventDefault();
+
+        if (!validateUser()) {
+            return;
+        }
+
+        setUsers(
+            users.map(user => {
+
+                if (
+                    user.id === editUserId
+                ) {
+
+                    return {
+
+                        ...user,
+
+                        name: name.trim(),
+
+                        type: userType,
+
+                        countryCode,
+
+                        contact,
+
+                        email: email.trim(),
+
+                        technology: [
+                            ...technology
+                        ]
+                    };
+                }
+
+                return user;
+            })
+        );
+
+        clearUserForm();
+
+        setActiveMenu("viewUsers");
+
+        showSuccess(
+            "User updated successfully."
+        );
+    };
+
+    // =====================================================
+    // DELETE USER
+    // =====================================================
+
+    const confirmDeleteUser = () => {
 
         setUsers(
             users.filter(
                 user =>
-                    user.id !== deleteUser.id
+                    user.id !==
+                    deleteUser.id
             )
         );
 
         setDeleteUser(null);
 
-        setSuccessMessage(
-            "User deleted successfully!"
-        );
+        setSelectedUserId(null);
 
-        setTimeout(() => {
-            setSuccessMessage("");
-        }, 3000);
+        showSuccess(
+            "User deleted successfully."
+        );
     };
 
+    // =====================================================
+    // USER SEARCH
+    // =====================================================
 
-    const handleMenuChange = (menu) => {
+    const filteredUsers =
+        users.filter(user => {
 
-        setActiveMenu(menu);
+            const search =
+                searchUser.toLowerCase();
 
-        setDeleteUser(null);
+            return (
 
-        setSelectedUser(null);
+                user.id
+                    .toLowerCase()
+                    .includes(search)
 
-        setSuccessMessage("");
+                ||
 
-        setShowSuccess(false);
+                user.name
+                    .toLowerCase()
+                    .includes(search)
 
-        if (menu !== "add") {
-            setEditUser(null);
+                ||
+
+                user.email
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                user.type
+                    .toLowerCase()
+                    .includes(search)
+            );
+        });
+
+    // =====================================================
+    // USER TYPES
+    // =====================================================
+
+    const supportUsers =
+        users.filter(
+            user =>
+                user.type === "User"
+        );
+
+    const customerUsers =
+        users.filter(
+            user =>
+                user.type === "Customer"
+        );
+
+    // =====================================================
+    // AGREED AMOUNT
+    // =====================================================
+
+    const getFinalAgreedAmount = () => {
+
+        if (
+            agreedAmount === "custom"
+        ) {
+
+            return customAgreedAmount;
+        }
+
+        return agreedAmount;
+    };
+
+    // =====================================================
+    // SUPPORT AGREED AMOUNT
+    // =====================================================
+
+    const getFinalSupportAgreedAmount = () => {
+
+        if (
+            supportAgreedAmount === "custom"
+        ) {
+
+            return customSupportAgreedAmount;
+        }
+
+        return supportAgreedAmount;
+    };
+
+    // =====================================================
+    // SUPPORT PERIOD
+    // =====================================================
+
+    const calculateSupportPeriodDays = (
+        startDate,
+        endDate
+    ) => {
+
+        if (
+            !startDate ||
+            !endDate
+        ) {
+
+            return 0;
+        }
+
+        const start =
+            new Date(
+                `${startDate}T00:00:00`
+            );
+
+        const end =
+            new Date(
+                `${endDate}T00:00:00`
+            );
+
+        const difference =
+            end.getTime() -
+            start.getTime();
+
+        if (difference < 0) {
+            return 0;
+        }
+
+        return (
+            Math.floor(
+                difference /
+                (1000 * 60 * 60 * 24)
+            ) + 1
+        );
+    };
+
+    // =====================================================
+    // NEXT DUE DATE
+    // =====================================================
+
+    const calculateNextDueDate = (
+        paymentDate,
+        supportPeriodDays
+    ) => {
+
+        if (
+            !paymentDate ||
+            !supportPeriodDays
+        ) {
+
+            return "";
+        }
+
+        const date =
+            new Date(
+                `${paymentDate}T00:00:00`
+            );
+
+        date.setDate(
+            date.getDate() +
+            Number(supportPeriodDays)
+        );
+
+        const year =
+            date.getFullYear();
+
+        const month =
+            String(
+                date.getMonth() + 1
+            ).padStart(2, "0");
+
+        const day =
+            String(
+                date.getDate()
+            ).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    };
+
+    // =====================================================
+    // SUPPORT VALIDATION
+    // =====================================================
+
+    const validateSupport = () => {
+
+        if (!assignedSupportUser) {
+
+            alert(
+                "Please select Support Person."
+            );
+
+            return false;
+        }
+
+        if (!supportClient) {
+
+            alert(
+                "Please select Client / Paying User."
+            );
+
+            return false;
+        }
+
+        if (!supportStartDate) {
+
+            alert(
+                "Please select Support Start Date."
+            );
+
+            return false;
+        }
+
+        if (
+            supportEndDate &&
+            supportEndDate < supportStartDate
+        ) {
+
+            alert(
+                "Support End Date cannot be before Start Date."
+            );
+
+            return false;
+        }
+
+        const finalAmount =
+            getFinalAgreedAmount();
+
+        if (
+            finalAmount === "" ||
+            isNaN(finalAmount) ||
+            Number(finalAmount) <= 0
+        ) {
+
+            alert(
+                "Please enter valid Agreed Amount."
+            );
+
+            return false;
+        }
+
+        const finalSupportAmount =
+            getFinalSupportAgreedAmount();
+
+        if (
+            finalSupportAmount === "" ||
+            isNaN(finalSupportAmount) ||
+            Number(finalSupportAmount) <= 0
+        ) {
+
+            alert(
+                "Please enter valid Support Agreed Amount."
+            );
+
+            return false;
+        }
+
+        return true;
+    };
+
+    // =====================================================
+    // CLEAR SUPPORT
+    // =====================================================
+
+    const clearSupportForm = () => {
+
+        setSupportClient("");
+        setAssignedSupportUser("");
+        setSupportStartDate("");
+        setSupportEndDate("");
+
+        setAgreedAmount("");
+        setCustomAgreedAmount("");
+
+        setSupportAgreedAmount("");
+        setCustomSupportAgreedAmount("");
+
+        setEditSupportId(null);
+    };
+
+    // =====================================================
+    // ADD SUPPORT
+    // =====================================================
+
+    const handleAddSupport = (e) => {
+
+        e.preventDefault();
+
+        if (!validateSupport()) {
+            return;
+        }
+
+        const finalAmount =
+            Number(
+                getFinalAgreedAmount()
+            );
+
+        const finalSupportAmount =
+            Number(
+                getFinalSupportAgreedAmount()
+            );
+
+        const supportPeriodDays =
+            calculateSupportPeriodDays(
+                supportStartDate,
+                supportEndDate
+            );
+
+        const newSupport = {
+
+            id: generateSupportId(),
+
+            client:
+                supportClient,
+
+            assignedUser:
+                assignedSupportUser,
+
+            startDate:
+                supportStartDate,
+
+            endDate:
+                supportEndDate,
+
+            agreedAmount:
+                finalAmount,
+
+            supportAgreedAmount:
+                finalSupportAmount,
+
+            supportPeriodDays,
+
+            supportPeriod:
+                supportEndDate
+                    ? `${supportPeriodDays} Days`
+                    : "Ongoing",
+
+            nextDueDate: "",
+
+            lastPaymentDate: ""
+        };
+
+        setSupports([
+            ...supports,
+            newSupport
+        ]);
+
+        setHighlightedSupportId(
+            newSupport.id
+        );
+
+        clearSupportForm();
+
+        setActiveMenu(
+            "supportView"
+        );
+
+        showSuccess(
+            "Support assignment added successfully."
+        );
+    };
+
+    // =====================================================
+    // SUPPORT ROW
+    // =====================================================
+
+    const handleSupportRowClick = (
+        support
+    ) => {
+
+        if (
+            selectedSupportId ===
+            support.id
+        ) {
+
+            setSelectedSupportId(null);
+
+        } else {
+
+            setSelectedSupportId(
+                support.id
+            );
         }
     };
 
+    // =====================================================
+    // SELECTED SUPPORT
+    // =====================================================
+
+    const getSelectedSupport = () => {
+
+        return supports.find(
+            support =>
+                support.id ===
+                selectedSupportId
+        );
+    };
+
+    // =====================================================
+    // EDIT SUPPORT
+    // =====================================================
+
+    const editSupportRecord = (
+        support
+    ) => {
+
+        if (!support) {
+            return;
+        }
+
+        setSupportClient(
+            support.client
+        );
+
+        setAssignedSupportUser(
+            support.assignedUser
+        );
+
+        setSupportStartDate(
+            support.startDate
+        );
+
+        setSupportEndDate(
+            support.endDate
+        );
+
+        setAgreedAmount(
+            String(
+                support.agreedAmount || ""
+            )
+        );
+
+        setCustomAgreedAmount("");
+
+        setSupportAgreedAmount(
+            String(
+                support.supportAgreedAmount || ""
+            )
+        );
+
+        setCustomSupportAgreedAmount("");
+
+        setEditSupportId(
+            support.id
+        );
+
+        setSelectedSupportId(null);
+
+        // Edit must return to Support page
+        setActiveMenu("support");
+    };
+
+    // =====================================================
+    // UPDATE SUPPORT
+    // =====================================================
+
+    const handleUpdateSupport = (
+        e
+    ) => {
+
+        e.preventDefault();
+
+        if (!validateSupport()) {
+            return;
+        }
+
+        const finalAmount =
+            Number(
+                getFinalAgreedAmount()
+            );
+
+        const finalSupportAmount =
+            Number(
+                getFinalSupportAgreedAmount()
+            );
+
+        const supportPeriodDays =
+            calculateSupportPeriodDays(
+                supportStartDate,
+                supportEndDate
+            );
+
+        setSupports(
+            supports.map(
+                support => {
+
+                    if (
+                        support.id ===
+                        editSupportId
+                    ) {
+
+                        return {
+
+                            ...support,
+
+                            client:
+                                supportClient,
+
+                            assignedUser:
+                                assignedSupportUser,
+
+                            startDate:
+                                supportStartDate,
+
+                            endDate:
+                                supportEndDate,
+
+                            agreedAmount:
+                                finalAmount,
+
+                            supportAgreedAmount:
+                                finalSupportAmount,
+
+                            supportPeriodDays,
+
+                            supportPeriod:
+                                supportEndDate
+                                    ? `${supportPeriodDays} Days`
+                                    : "Ongoing"
+                        };
+                    }
+
+                    return support;
+                }
+            )
+        );
+
+        clearSupportForm();
+
+        setActiveMenu(
+            "support"
+        );
+
+        showSuccess(
+            "Support updated successfully."
+        );
+    };
+
+    // =====================================================
+    // DELETE SUPPORT
+    // =====================================================
+
+    const confirmDeleteSupport = () => {
+
+        setSupports(
+            supports.filter(
+                support =>
+                    support.id !==
+                    deleteSupport.id
+            )
+        );
+
+        setPayments(
+            payments.filter(
+                payment =>
+                    payment.supportId !==
+                    deleteSupport.id
+            )
+        );
+
+        setDeleteSupport(null);
+
+        setSelectedSupportId(null);
+
+        showSuccess(
+            "Support deleted successfully."
+        );
+    };
+
+    // =====================================================
+    // SUPPORT SEARCH
+    // =====================================================
+
+    const filteredSupports =
+        supports.filter(
+            support => {
+
+                const search =
+                    searchSupport.toLowerCase();
+
+                const assignedUser =
+                    users.find(
+                        user =>
+                            user.id ===
+                            support.assignedUser
+                    );
+
+                const clientUser =
+                    users.find(
+                        user =>
+                            user.id ===
+                            support.client
+                    );
+
+                return (
+
+                    support.id
+                        .toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    support.assignedUser
+                        .toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    support.client
+                        .toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    assignedUser?.name
+                        ?.toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    clientUser?.name
+                        ?.toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    clientUser?.email
+                        ?.toLowerCase()
+                        .includes(search)
+                );
+            }
+        );
+
+    // =====================================================
+    // PAYMENT TOTALS
+    // =====================================================
+
+    const getPaymentTotals = (
+        supportId
+    ) => {
+
+        const supportPayments =
+            payments.filter(
+                payment =>
+                    payment.supportId ===
+                    supportId
+            );
+
+        const received =
+            supportPayments.reduce(
+                (
+                    total,
+                    payment
+                ) =>
+                    total +
+                    Number(
+                        payment.amountReceived || 0
+                    ),
+                0
+            );
+
+        const paid =
+            supportPayments.reduce(
+                (
+                    total,
+                    payment
+                ) =>
+                    total +
+                    Number(
+                        payment.amountPaid || 0
+                    ),
+                0
+            );
+
+        const sortedPayments =
+            [...supportPayments].sort(
+                (a, b) => {
+
+                    const dateA =
+                        new Date(
+                            a.receivedDate ||
+                            a.paidDate ||
+                            "1900-01-01"
+                        );
+
+                    const dateB =
+                        new Date(
+                            b.receivedDate ||
+                            b.paidDate ||
+                            "1900-01-01"
+                        );
+
+                    return dateB - dateA;
+                }
+            );
+
+        const latestPayment =
+            sortedPayments[0];
+
+        return {
+
+            received,
+
+            paid,
+
+            lastPaymentDate:
+                latestPayment
+                    ? (
+                        latestPayment.receivedDate ||
+                        latestPayment.paidDate
+                    )
+                    : "",
+
+            nextDueDate:
+                latestPayment
+                    ? latestPayment.nextDueDate
+                    : ""
+        };
+    };
+
+    // =====================================================
+    // HISTORY
+    // =====================================================
+
+    const openHistory = (
+        support
+    ) => {
+
+        if (!support) {
+            return;
+        }
+
+        setHistorySupport(
+            support
+        );
+
+        setPaymentAmountReceived("");
+        setPaymentReceivedDate("");
+        setPaymentAmountPaid("");
+        setPaymentPaidDate("");
+        setPaymentComments("");
+    };
+
+    // =====================================================
+    // ADD PAYMENT
+    // =====================================================
+
+    const handleAddPayment = (
+        e
+    ) => {
+
+        e.preventDefault();
+
+        if (!historySupport) {
+            return;
+        }
+
+        if (
+            paymentAmountReceived === "" &&
+            paymentAmountPaid === ""
+        ) {
+
+            alert(
+                "Please enter Amount Received or Amount Paid to Support."
+            );
+
+            return;
+        }
+
+        if (
+            paymentAmountReceived !== "" &&
+            !paymentReceivedDate
+        ) {
+
+            alert(
+                "Please select Received Date."
+            );
+
+            return;
+        }
+
+        if (
+            paymentAmountPaid !== "" &&
+            !paymentPaidDate
+        ) {
+
+            alert(
+                "Please select Paid Date."
+            );
+
+            return;
+        }
+
+        const paymentBaseDate =
+            paymentReceivedDate ||
+            paymentPaidDate;
+
+        const nextDueDate =
+            calculateNextDueDate(
+                paymentBaseDate,
+                historySupport.supportPeriodDays
+            );
+
+        const newPayment = {
+
+            id: Date.now(),
+
+            supportId:
+                historySupport.id,
+
+            amountReceived:
+                Number(
+                    paymentAmountReceived
+                ) || 0,
+
+            receivedDate:
+                paymentReceivedDate,
+
+            amountPaid:
+                Number(
+                    paymentAmountPaid
+                ) || 0,
+
+            paidDate:
+                paymentPaidDate,
+
+            nextDueDate,
+
+            comments:
+                paymentComments
+        };
+
+        setPayments([
+            ...payments,
+            newPayment
+        ]);
+
+        setSupports(
+            supports.map(
+                support => {
+
+                    if (
+                        support.id ===
+                        historySupport.id
+                    ) {
+
+                        return {
+
+                            ...support,
+
+                            nextDueDate,
+
+                            lastPaymentDate:
+                                paymentReceivedDate ||
+                                paymentPaidDate
+                        };
+                    }
+
+                    return support;
+                }
+            )
+        );
+
+        setPaymentAmountReceived("");
+        setPaymentReceivedDate("");
+        setPaymentAmountPaid("");
+        setPaymentPaidDate("");
+        setPaymentComments("");
+
+        showSuccess(
+            "Payment added successfully."
+        );
+    };
+
+    // =====================================================
+    // DELETE PAYMENT
+    // =====================================================
+
+    const deletePayment = (
+        paymentId
+    ) => {
+
+        setPayments(
+            payments.filter(
+                payment =>
+                    payment.id !==
+                    paymentId
+            )
+        );
+
+        showSuccess(
+            "Payment deleted successfully."
+        );
+    };
+
+    // =====================================================
+    // RETURN UI
+    // =====================================================
 
     return (
 
         <div className="support-page">
 
-
-            {/* ================================
-                SUPPORT NAVIGATION
-            ================================= */}
+            {/* =================================================
+                NAVIGATION
+            ================================================= */}
 
             <div className="support-navigation">
 
                 <div className="support-brand">
 
-                    <div className="support-brand-icon">
-                        ✦
-                    </div>
-
-                    <div>
-                        <strong>
-                            Support Center
-                        </strong>
-
-                        <span>
-                            Management Portal
-                        </span>
-                    </div>
+                    <h2>
+                        Support Management System
+                    </h2>
 
                 </div>
 
-
-                <div className="support-nav-buttons">
+                <div className="support-nav-links">
 
                     <button
                         className={
                             activeMenu === "home"
-                                ? "support-nav-button active"
-                                : "support-nav-button"
+                                ? "active"
+                                : ""
                         }
-                        onClick={() => {
-
-                            handleMenuChange("home");
-
-                            navigate("/");
-                        }}
+                        onClick={() =>
+                            setActiveMenu("home")
+                        }
                     >
-                        <span>⌂</span>
                         Home
                     </button>
 
-
                     <button
                         className={
-                            activeMenu === "add"
-                                ? "support-nav-button active"
-                                : "support-nav-button"
+                            activeMenu === "addUser"
+                                ? "active"
+                                : ""
                         }
                         onClick={() =>
-                            handleMenuChange("add")
+                            setActiveMenu("addUser")
                         }
                     >
-                        <span>＋</span>
                         Add User
                     </button>
 
+                    <button
+                        className={
+                            activeMenu === "viewUsers"
+                                ? "active"
+                                : ""
+                        }
+                        onClick={() =>
+                            setActiveMenu("viewUsers")
+                        }
+                    >
+                        View Users
+                    </button>
 
                     <button
                         className={
-                            activeMenu === "view"
-                                ? "support-nav-button active"
-                                : "support-nav-button"
+                            activeMenu === "support"
+                                ? "active"
+                                : ""
                         }
                         onClick={() =>
-                            handleMenuChange("view")
+                            setActiveMenu("support")
                         }
                     >
-                        <span>◉</span>
-                        View Users
+                        Support
+                    </button>
+
+                    <button
+                        className={
+                            activeMenu === "supportView"
+                                ? "active"
+                                : ""
+                        }
+                        onClick={() =>
+                            setActiveMenu("supportView")
+                        }
+                    >
+                        Support View
+                    </button>
+
+                    <button
+                        className={
+                            activeMenu === "contact"
+                                ? "active"
+                                : ""
+                        }
+                        onClick={() =>
+                            setActiveMenu("contact")
+                        }
+                    >
+                        Contact
                     </button>
 
                 </div>
 
             </div>
 
+            <div className="support-content">
 
-            <main className="support-content">
-
-
-                {/* SUCCESS MESSAGE */}
-
-                {successMessage && (
-
-                    <div className="success-card">
-
-                        <div className="success-icon">
-                            ✓
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Success!
-                            </strong>
-
-                            <p>
-                                {successMessage}
-                            </p>
-
-                        </div>
-
-                    </div>
-                )}
-
-
-                {/* ================================
+                {/* =================================================
                     HOME
-                ================================= */}
+                ================================================= */}
 
                 {activeMenu === "home" && (
 
-                    <section className="support-home">
+                    <section className="user-form-card home-card">
 
-                        <div className="support-heading">
-
-                            <span>
-                                SUPPORT MANAGEMENT
-                            </span>
-
-                            <h1>
-                                Everything you need,
-                                <br />
-                                <em>in one place.</em>
-                            </h1>
-
-                            <p>
-                                Manage support users and
-                                their availability with ease.
-                            </p>
-
+                        <div className="home-icon">
+                            ✦
                         </div>
 
+                        <h1>
+                            Welcome to Support Management System
+                        </h1>
 
-                        <div className="home-action-cards">
-
-                            <button
-                                className="home-action-card purple"
-                                onClick={() =>
-                                    handleMenuChange("add")
-                                }
-                            >
-
-                                <div>＋</div>
-
-                                <h3>
-                                    Add New User
-                                </h3>
-
-                                <p>
-                                    Create a new support
-                                    user profile.
-                                </p>
-
-                            </button>
-
-
-                            <button
-                                className="home-action-card blue"
-                                onClick={() =>
-                                    handleMenuChange("view")
-                                }
-                            >
-
-                                <div>◉</div>
-
-                                <h3>
-                                    View Users
-                                </h3>
-
-                                <p>
-                                    View and manage all
-                                    support users.
-                                </p>
-
-                            </button>
-
-                        </div>
+                        <p>
+                            Manage users, support assignments
+                            and payment history from one place.
+                        </p>
 
                     </section>
                 )}
 
-
-                {/* ================================
+                {/* =================================================
                     ADD USER
-                ================================= */}
+                ================================================= */}
 
-                {activeMenu === "add" && (
+                {activeMenu === "addUser" && (
 
-                    <section className="add-user-section">
+                    <section className="user-form-card">
 
+                        <div className="page-title-row">
 
-                        {/* Only small heading */}
+                            <div>
 
-                        <div className="simple-page-title">
+                                <span className="page-eyebrow">
+                                    USER
+                                </span>
 
-                            <h1>
-                                {editUser
-                                    ? "Update User"
-                                    : "Add User"}
-                            </h1>
+                                <h1>
+                                    {editUserId
+                                        ? "Edit User"
+                                        : "Add User"}
+                                </h1>
 
-                            <p>
-                                {editUser
-                                    ? "Update the support user's details."
-                                    : "Create a new support user profile."}
-                            </p>
+                            </div>
 
                         </div>
 
-
                         <form
-                            className="form-card"
-                            onSubmit={handleSubmit}
+                            className="user-form"
+                            onSubmit={
+                                editUserId
+                                    ? handleUpdateUser
+                                    : handleAddUser
+                            }
                         >
 
+                            <div className="form-grid">
 
-                            {/* PERSONAL INFORMATION */}
+                                {/* NAME */}
 
-                            <div className="form-section">
-
-                                <div className="form-top">
-
-                                    <div className="form-icon">
-                                        👤
-                                    </div>
-
-                                    <div>
-
-                                        <h2>
-                                            Personal Information
-                                        </h2>
-
-                                        <p>
-                                            User contact details
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div className="input-group">
+                                <div className="field">
 
                                     <label>
-                                        Name
-                                        <span>*</span>
+                                        Name *
                                     </label>
 
                                     <input
                                         type="text"
-                                        placeholder="Enter full name"
                                         value={name}
-                                        onChange={(e) =>
+                                        maxLength="50"
+                                        placeholder="Enter full name"
+                                        onChange={e =>
                                             setName(
                                                 e.target.value
                                             )
                                         }
                                     />
 
-                                    {errors.name && (
-
-                                        <small className="error">
-                                            {errors.name}
-                                        </small>
-
-                                    )}
-
                                 </div>
 
+                                {/* TYPE */}
 
-                                <div className="input-group">
+                                <div className="field">
 
                                     <label>
-                                        Contact Number
-                                        <span>*</span>
+                                        Type *
                                     </label>
 
-                                    <input
-                                        type="text"
-                                        maxLength="10"
-                                        placeholder="10 digit mobile number"
-                                        value={contact}
-                                        onChange={(e) => {
+                                    <select
+                                        value={userType}
+                                        onChange={e =>
+                                            setUserType(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
 
-                                            const value =
-                                                e.target.value.replace(
-                                                    /\D/g,
-                                                    ""
-                                                );
+                                        <option value="">
+                                            Select Type
+                                        </option>
 
-                                            setContact(value);
-                                        }}
-                                    />
+                                        <option value="User">
+                                            User
+                                        </option>
 
-                                    {errors.contact && (
+                                        <option value="Customer">
+                                            Customer
+                                        </option>
 
-                                        <small className="error">
-                                            {errors.contact}
-                                        </small>
-
-                                    )}
+                                    </select>
 
                                 </div>
 
+                                {/* CONTACT */}
 
-                                <div className="input-group">
+                                <div className="field">
 
                                     <label>
-                                        Email
-                                        <span>*</span>
+                                        Contact Number *
+                                    </label>
+
+                                    <div className="contact-input-group">
+
+                                        <select
+                                            className="country-code"
+                                            value={
+                                                countryCode
+                                            }
+                                            onChange={e =>
+                                                setCountryCode(
+                                                    e.target.value
+                                                )
+                                            }
+                                        >
+
+                                            {countryCodes.map(
+                                                code => (
+
+                                                    <option
+                                                        key={
+                                                            code
+                                                        }
+                                                        value={
+                                                            code
+                                                        }
+                                                    >
+                                                        {
+                                                            code
+                                                        }
+                                                    </option>
+
+                                                )
+                                            )}
+
+                                        </select>
+
+                                        <input
+                                            type="text"
+                                            value={contact}
+                                            maxLength="10"
+                                            placeholder="Enter 10 digit number"
+                                            onChange={e =>
+                                                setContact(
+                                                    e.target.value.replace(
+                                                        /\D/g,
+                                                        ""
+                                                    )
+                                                )
+                                            }
+                                        />
+
+                                    </div>
+
+                                </div>
+
+                                {/* EMAIL */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Email *
                                     </label>
 
                                     <input
                                         type="email"
-                                        placeholder="example@email.com"
                                         value={email}
-                                        onChange={(e) =>
+                                        placeholder="Enter email address"
+                                        onChange={e =>
                                             setEmail(
                                                 e.target.value
                                             )
                                         }
                                     />
 
-                                    {errors.email && (
+                                </div>
 
-                                        <small className="error">
-                                            {errors.email}
-                                        </small>
+                                {/* TECHNOLOGY */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Technology *
+                                    </label>
+
+                                    <select
+                                        value=""
+                                        onChange={
+                                            handleTechnologyChange
+                                        }
+                                    >
+
+                                        <option value="">
+                                            Select Technology
+                                        </option>
+
+                                        {technologies.map(
+                                            item => (
+
+                                                <option
+                                                    key={item}
+                                                    value={item}
+                                                >
+                                                    {item}
+                                                </option>
+
+                                            )
+                                        )}
+
+                                    </select>
+
+                                    <div className="custom-tech-row">
+
+                                        <input
+                                            type="text"
+                                            value={
+                                                customTechnology
+                                            }
+                                            placeholder="Enter new technology"
+                                            onChange={e =>
+                                                setCustomTechnology(
+                                                    e.target.value
+                                                )
+                                            }
+                                            onKeyDown={e => {
+
+                                                if (
+                                                    e.key ===
+                                                    "Enter"
+                                                ) {
+
+                                                    e.preventDefault();
+
+                                                    addCustomTechnology();
+                                                }
+
+                                            }}
+                                        />
+
+                                        <button
+                                            type="button"
+                                            className="secondary-button"
+                                            onClick={
+                                                addCustomTechnology
+                                            }
+                                        >
+                                            Add
+                                        </button>
+
+                                    </div>
+
+                                    {technology.length > 0 && (
+
+                                        <div className="technology-tags">
+
+                                            {technology.map(
+                                                item => (
+
+                                                    <div
+                                                        className="technology-tag"
+                                                        key={item}
+                                                    >
+
+                                                        <span>
+                                                            {item}
+                                                        </span>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                removeTechnology(
+                                                                    item
+                                                                )
+                                                            }
+                                                        >
+                                                            ×
+                                                        </button>
+
+                                                    </div>
+
+                                                )
+                                            )}
+
+                                        </div>
 
                                     )}
 
@@ -810,391 +1840,26 @@ function Support() {
 
                             </div>
 
-
-                            {/* SUPPORT INFORMATION */}
-
-                            <div className="form-section">
-
-                                <div className="form-top">
-
-                                    <div className="form-icon">
-                                        ⚙
-                                    </div>
-
-                                    <div>
-
-                                        <h2>
-                                            Support Information
-                                        </h2>
-
-                                        <p>
-                                            Technical availability
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div className="input-group">
-
-                                    <label>
-                                        Technology
-                                        <span>*</span>
-                                    </label>
-
-                                    <select
-                                        value={technology}
-                                        onChange={(e) =>
-                                            setTechnology(
-                                                e.target.value
-                                            )
-                                        }
-                                    >
-
-                                        <option value="">
-                                            Select technology
-                                        </option>
-
-                                        {technologies.map(
-                                            tech => (
-
-                                                <option
-                                                    key={tech}
-                                                    value={tech}
-                                                >
-                                                    {tech}
-                                                </option>
-
-                                            )
-                                        )}
-
-                                    </select>
-
-                                    {errors.technology && (
-
-                                        <small className="error">
-                                            {errors.technology}
-                                        </small>
-
-                                    )}
-
-                                </div>
-
-
-                                <div className="input-group">
-
-                                    <label>
-                                        Time Zone
-                                        <span>*</span>
-                                    </label>
-
-                                    <select
-                                        value={timeZone}
-                                        onChange={(e) =>
-                                            setTimeZone(
-                                                e.target.value
-                                            )
-                                        }
-                                    >
-
-                                        <option value="">
-                                            Select time zone
-                                        </option>
-
-                                        {timeZones.map(
-                                            zone => (
-
-                                                <option
-                                                    key={zone}
-                                                    value={zone}
-                                                >
-                                                    {zone}
-                                                </option>
-
-                                            )
-                                        )}
-
-                                    </select>
-
-                                    {errors.timeZone && (
-
-                                        <small className="error">
-                                            {errors.timeZone}
-                                        </small>
-
-                                    )}
-
-                                </div>
-
-
-                                {/* SUPPORT TIME */}
-
-                                <div className="input-group">
-
-                                    <label>
-                                        Support Time
-                                        <span>*</span>
-                                    </label>
-
-
-                                    <button
-                                        type="button"
-                                        className={
-                                            startTime &&
-                                                endTime
-                                                ? "time-selector selected"
-                                                : "time-selector"
-                                        }
-                                        onClick={() =>
-                                            setShowTimePicker(
-                                                !showTimePicker
-                                            )
-                                        }
-                                    >
-
-                                        <span className="clock">
-                                            🕒
-                                        </span>
-
-                                        <span className="time-content">
-
-                                            <small>
-                                                {startTime &&
-                                                    endTime
-                                                    ? "Selected Support Time"
-                                                    : "Choose Support Time"}
-                                            </small>
-
-                                            <strong>
-
-                                                {startTime &&
-                                                    endTime
-                                                    ? `${getDisplayTime(startTime)} - ${getDisplayTime(endTime)}`
-                                                    : "Select start and end time"}
-
-                                            </strong>
-
-                                        </span>
-
-                                        <span className="time-arrow">
-                                            {showTimePicker
-                                                ? "▲"
-                                                : "▼"}
-                                        </span>
-
-                                    </button>
-
-
-                                    {errors.supportTime && (
-
-                                        <small className="error">
-                                            {errors.supportTime}
-                                        </small>
-
-                                    )}
-
-
-                                    {showTimePicker && (
-
-                                        <div className="time-picker">
-
-                                            <div className="time-picker-title">
-
-                                                <div>
-
-                                                    <span>
-                                                        SUPPORT HOURS
-                                                    </span>
-
-                                                    <h3>
-                                                        Choose your time
-                                                    </h3>
-
-                                                </div>
-
-                                                <div className="time-picker-icon">
-                                                    🕐
-                                                </div>
-
-                                            </div>
-
-
-                                            <div className="time-columns">
-
-
-                                                {/* START TIME */}
-
-                                                <div className="time-column">
-
-                                                    <div className="time-column-header">
-
-                                                        <span>
-                                                            01
-                                                        </span>
-
-                                                        <div>
-
-                                                            <strong>
-                                                                Start Time
-                                                            </strong>
-
-                                                            <small>
-                                                                Choose starting time
-                                                            </small>
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <div className="time-options">
-
-                                                        {timeOptions.map(
-                                                            time => (
-
-                                                                <button
-                                                                    type="button"
-                                                                    key={
-                                                                        time.value
-                                                                    }
-                                                                    className={
-                                                                        startTime ===
-                                                                            time.value
-                                                                            ? "time-option selected"
-                                                                            : "time-option"
-                                                                    }
-                                                                    onClick={() =>
-                                                                        selectStartTime(
-                                                                            time.value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {time.display}
-                                                                </button>
-
-                                                            )
-                                                        )}
-
-                                                    </div>
-
-                                                </div>
-
-
-                                                {/* END TIME */}
-
-                                                <div className="time-column">
-
-                                                    <div className="time-column-header">
-
-                                                        <span>
-                                                            02
-                                                        </span>
-
-                                                        <div>
-
-                                                            <strong>
-                                                                End Time
-                                                            </strong>
-
-                                                            <small>
-                                                                Choose ending time
-                                                            </small>
-
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    <div className="time-options">
-
-                                                        {timeOptions
-                                                            .filter(
-                                                                time =>
-                                                                    !startTime ||
-                                                                    time.value >
-                                                                    startTime
-                                                            )
-                                                            .map(
-                                                                time => (
-
-                                                                    <button
-                                                                        type="button"
-                                                                        key={
-                                                                            time.value
-                                                                        }
-                                                                        disabled={
-                                                                            !startTime
-                                                                        }
-                                                                        className={
-                                                                            endTime ===
-                                                                                time.value
-                                                                                ? "time-option selected"
-                                                                                : "time-option"
-                                                                        }
-                                                                        onClick={() =>
-                                                                            selectEndTime(
-                                                                                time.value
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        {time.display}
-                                                                    </button>
-
-                                                                )
-                                                            )}
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div className="time-info">
-
-                                                <span>
-                                                    ✓
-                                                </span>
-
-                                                Only 30-minute
-                                                intervals are available
-
-                                            </div>
-
-                                        </div>
-                                    )}
-
-                                </div>
-
-
-                                <div className="form-actions">
-
-                                    <button
-                                        type="button"
-                                        className="clear-button"
-                                        onClick={clearForm}
-                                    >
-                                        Clear
-                                    </button>
-
-
-                                    <button
-                                        type="submit"
-                                        className="submit-button"
-                                    >
-
-                                        {editUser
-                                            ? "Update User"
-                                            : "Add User"}
-
-                                        <span>
-                                            →
-                                        </span>
-
-                                    </button>
-
-                                </div>
+                            <div className="form-actions">
+
+                                <button
+                                    type="submit"
+                                    className="primary-button"
+                                >
+                                    {editUserId
+                                        ? "Update User"
+                                        : "Add User"}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="secondary-button"
+                                    onClick={
+                                        clearUserForm
+                                    }
+                                >
+                                    Clear
+                                </button>
 
                             </div>
 
@@ -1203,633 +1868,1189 @@ function Support() {
                     </section>
                 )}
 
-
-                {/* ================================
+                {/* =================================================
                     VIEW USERS
-                ================================= */}
+                ================================================= */}
 
-                {activeMenu === "view" && (
+                {activeMenu === "viewUsers" && (
 
-                    <section>
+                    <section className="users-card">
 
-                        <div className="simple-page-title">
+                        <div className="users-header">
 
-                            <h1>
-                                View Users
-                            </h1>
+                            <div>
 
-                            <p>
-                                Manage your support users.
-                            </p>
+                                <span className="page-eyebrow">
+                                    USERS
+                                </span>
 
-                        </div>
-
-
-                        <div className="users-card">
-
-                            <div className="users-header">
-
-                                <div>
-
-                                    <h2>
-                                        All Users
-                                    </h2>
-
-                                    <p>
-                                        Registered support users
-                                    </p>
-
-                                </div>
-
-                                <div className="user-count">
-                                    {users.length} Users
-                                </div>
+                                <h1>
+                                    View Users
+                                </h1>
 
                             </div>
 
+                            <input
+                                className="compact-search"
+                                type="text"
+                                placeholder="Search ID, name or email..."
+                                value={
+                                    searchUser
+                                }
+                                onChange={e =>
+                                    setSearchUser(
+                                        e.target.value
+                                    )
+                                }
+                            />
 
-                            {users.length === 0 ? (
+                        </div>
 
-                                <div className="empty-users">
+                        {selectedUserId && (
 
-                                    <div>
-                                        ◉
-                                    </div>
+                            <div className="user-view-tools">
 
-                                    <h3>
-                                        No users yet
-                                    </h3>
-
-                                    <p>
-                                        Add your first support
-                                        user to see them here.
-                                    </p>
+                                <div className="user-top-actions">
 
                                     <button
-                                        onClick={() =>
-                                            handleMenuChange(
-                                                "add"
-                                            )
-                                        }
+                                        onClick={() => {
+
+                                            const user =
+                                                users.find(
+                                                    u =>
+                                                        u.id ===
+                                                        selectedUserId
+                                                );
+
+                                            setViewUser(
+                                                user
+                                            );
+
+                                        }}
                                     >
-                                        + Add User
+                                        View
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+
+                                            const user =
+                                                users.find(
+                                                    u =>
+                                                        u.id ===
+                                                        selectedUserId
+                                                );
+
+                                            editUserRecord(
+                                                user
+                                            );
+
+                                        }}
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        className="danger-button"
+                                        onClick={() => {
+
+                                            const user =
+                                                users.find(
+                                                    u =>
+                                                        u.id ===
+                                                        selectedUserId
+                                                );
+
+                                            setDeleteUser(
+                                                user
+                                            );
+
+                                        }}
+                                    >
+                                        Delete
                                     </button>
 
                                 </div>
 
-                            ) : (
+                            </div>
+                        )}
 
-                                <div className="table-wrapper">
+                        <div className="table-container">
 
-                                    <table>
+                            <table>
 
-                                        <thead>
+                                <thead>
 
-                                            <tr>
+                                    <tr>
 
-                                                <th>
-                                                    User
-                                                </th>
+                                        <th>User ID</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Contact</th>
+                                        <th>Email</th>
+                                        <th>Technology</th>
+                                        <th>Registered Date</th>
 
-                                                <th>
-                                                    Contact
-                                                </th>
+                                    </tr>
 
-                                                <th>
-                                                    Technology
-                                                </th>
+                                </thead>
 
-                                                <th>
-                                                    Time Zone
-                                                </th>
+                                <tbody>
 
-                                                <th>
-                                                    Support Time
-                                                </th>
+                                    {filteredUsers.map(
+                                        user => (
 
-                                                <th>
-                                                    Actions
-                                                </th>
+                                            <tr
+                                                key={
+                                                    user.id
+                                                }
+                                                onClick={() =>
+                                                    handleUserRowClick(
+                                                        user
+                                                    )
+                                                }
+                                                className={
+                                                    selectedUserId ===
+                                                    user.id
+                                                        ? "selected-user-row"
+                                                        : ""
+                                                }
+                                            >
+
+                                                <td>
+
+                                                    <span className="user-id-badge">
+                                                        {user.id}
+                                                    </span>
+
+                                                </td>
+
+                                                <td>
+                                                    {user.name}
+                                                </td>
+
+                                                <td>
+
+                                                    <span
+                                                        className={
+                                                            user.type ===
+                                                            "User"
+                                                                ? "type-badge user-type"
+                                                                : "type-badge customer-type"
+                                                        }
+                                                    >
+                                                        {user.type}
+                                                    </span>
+
+                                                </td>
+
+                                                <td>
+
+                                                    {user.countryCode}{" "}
+                                                    {user.contact}
+
+                                                </td>
+
+                                                <td>
+                                                    {user.email}
+                                                </td>
+
+                                                <td>
+
+                                                    <div className="technology-list">
+
+                                                        {user.technology?.map(
+                                                            tech => (
+
+                                                                <span
+                                                                    className="table-tech-tag"
+                                                                    key={
+                                                                        tech
+                                                                    }
+                                                                >
+                                                                    {tech}
+                                                                </span>
+
+                                                            )
+                                                        )}
+
+                                                    </div>
+
+                                                </td>
+
+                                                <td>
+                                                    {
+                                                        user.registeredDate
+                                                    }
+                                                </td>
 
                                             </tr>
 
-                                        </thead>
+                                        )
+                                    )}
 
+                                </tbody>
 
-                                        <tbody>
-
-                                            {users.map(
-                                                user => (
-
-                                                    <tr
-                                                        key={
-                                                            user.id
-                                                        }
-                                                    >
-
-                                                        <td>
-
-                                                            <div className="user-info">
-
-                                                                <div className="avatar">
-                                                                    {user.name
-                                                                        .charAt(0)
-                                                                        .toUpperCase()}
-                                                                </div>
-
-                                                                <div>
-
-                                                                    <strong>
-                                                                        {user.name}
-                                                                    </strong>
-
-                                                                    <small>
-                                                                        {user.id}
-                                                                    </small>
-
-                                                                </div>
-
-                                                            </div>
-
-                                                        </td>
-
-
-                                                        <td>
-
-                                                            <div>
-                                                                {user.contact}
-                                                            </div>
-
-                                                            <small>
-                                                                {user.email}
-                                                            </small>
-
-                                                        </td>
-
-
-                                                        <td>
-
-                                                            <span className="badge">
-                                                                {user.technology}
-                                                            </span>
-
-                                                        </td>
-
-
-                                                        <td>
-                                                            {user.timeZone}
-                                                        </td>
-
-
-                                                        <td>
-
-                                                            {getDisplayTime(
-                                                                user.startTime
-                                                            )}
-
-                                                            {" - "}
-
-                                                            {getDisplayTime(
-                                                                user.endTime
-                                                            )}
-
-                                                        </td>
-
-
-                                                        <td>
-
-                                                            <div className="actions">
-
-                                                                <button
-                                                                    className="edit-button"
-                                                                    onClick={() =>
-                                                                        handleEdit(
-                                                                            user
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Edit
-                                                                </button>
-
-
-                                                                <button
-                                                                    className="delete-button"
-                                                                    onClick={() =>
-                                                                        setDeleteUser(
-                                                                            user
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Delete
-                                                                </button>
-
-
-                                                                <button
-                                                                    className="view-button"
-                                                                    onClick={() =>
-                                                                        setSelectedUser(
-                                                                            user
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    View
-                                                                </button>
-
-                                                            </div>
-
-                                                        </td>
-
-                                                    </tr>
-
-                                                )
-                                            )}
-
-                                        </tbody>
-
-                                    </table>
-
-                                </div>
-                            )}
+                            </table>
 
                         </div>
 
-                    </section>
-                )}
+                        {filteredUsers.length === 0 && (
 
-            </main>
-
-
-            {/* ================================
-                OTP POPUP
-            ================================= */}
-
-            {showOtp && (
-
-                <div className="delete-overlay">
-
-                    <div className="otp-card">
-
-                        <div className="otp-icon">
-                            ✉
-                        </div>
-
-                        <span className="otp-label">
-                            VERIFY MOBILE NUMBER
-                        </span>
-
-                        <h2>
-                            Verify your number
-                        </h2>
-
-                        <p>
-                            We've sent a 6-digit OTP to
-                        </p>
-
-                        <strong className="otp-mobile">
-                            +91 {contact}
-                        </strong>
-
-
-                        <input
-                            className="otp-input"
-                            type="text"
-                            maxLength="6"
-                            placeholder="Enter 6-digit OTP"
-                            value={otp}
-                            onChange={(e) => {
-
-                                const value =
-                                    e.target.value.replace(
-                                        /\D/g,
-                                        ""
-                                    );
-
-                                setOtp(value);
-
-                                setOtpError("");
-                            }}
-                        />
-
-
-                        {otpError && (
-
-                            <div className="otp-error">
-                                {otpError}
+                            <div className="empty-state">
+                                No users found.
                             </div>
 
                         )}
 
+                    </section>
+                )}
 
-                        <button
-                            className="verify-otp-button"
-                            onClick={verifyOtp}
-                        >
-                            Verify OTP
-                            <span>→</span>
-                        </button>
+                {/* =================================================
+                    SUPPORT ENTRY
+                ================================================= */}
 
+                {activeMenu === "support" && (
 
-                        <button
-                            className="resend-otp-button"
-                            onClick={resendOtp}
-                        >
-                            Resend OTP
-                        </button>
+                    <section className="support-entry-card">
 
-
-                        <div className="demo-otp">
-                            Demo OTP: <strong>123456</strong>
-                        </div>
-
-
-                        <button
-                            className="cancel-otp"
-                            onClick={() =>
-                                setShowOtp(false)
-                            }
-                        >
-                            Cancel
-                        </button>
-
-                    </div>
-
-                </div>
-            )}
-
-
-            {/* ================================
-                PREMIUM SUCCESS
-            ================================= */}
-
-            {showSuccess && (
-
-                <div className="delete-overlay">
-
-                    <div className="premium-success-card">
-
-                        <div className="success-orbit">
-
-                            <div className="success-big-icon">
-                                ✓
-                            </div>
-
-                        </div>
-
-
-                        <div className="success-stars">
-                            ✦　✧　✦
-                        </div>
-
-
-                        <span className="success-small-title">
-                            ALL SET
-                        </span>
-
-
-                        <h2>
-                            You're all set! ✨
-                        </h2>
-
-
-                        <p>
-                            The support user has been
-                            successfully added and verified.
-                        </p>
-
-
-                        <div className="thank-you-message">
-                            Thank you for keeping your
-                            support team connected. 💜
-                        </div>
-
-
-                        <button
-                            className="success-done-button"
-                            onClick={handleDone}
-                        >
-                            Done
-                            <span>→</span>
-                        </button>
-
-                    </div>
-
-                </div>
-            )}
-
-
-            {/* ================================
-                USER DETAILS
-            ================================= */}
-
-            {selectedUser && (
-
-                <div className="delete-overlay">
-
-                    <div className="user-details-card">
-
-                        <button
-                            className="details-close"
-                            onClick={() =>
-                                setSelectedUser(null)
-                            }
-                        >
-                            ×
-                        </button>
-
-
-                        <div className="details-header">
-
-                            <div className="large-avatar">
-                                {selectedUser.name
-                                    .charAt(0)
-                                    .toUpperCase()}
-                            </div>
+                        <div className="page-title-row">
 
                             <div>
 
-                                <span>
-                                    SUPPORT USER
+                                <span className="page-eyebrow">
+                                    SUPPORT
                                 </span>
 
-                                <h2>
-                                    {selectedUser.name}
-                                </h2>
-
-                                <small>
-                                    {selectedUser.id}
-                                </small>
+                                <h1>
+                                    {editSupportId
+                                        ? "Edit Support"
+                                        : "Support"}
+                                </h1>
 
                             </div>
 
                         </div>
 
+                        <form
+                            className="user-form"
+                            onSubmit={
+                                editSupportId
+                                    ? handleUpdateSupport
+                                    : handleAddSupport
+                            }
+                        >
 
-                        <div className="details-grid">
+                            <div className="support-form-grid">
 
-                            <div className="detail-item">
+                                {/* SUPPORT PERSON */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Support Person *
+                                    </label>
+
+                                    <select
+                                        value={
+                                            assignedSupportUser
+                                        }
+                                        onChange={e =>
+                                            setAssignedSupportUser(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+
+                                        <option value="">
+                                            Select Support Person
+                                        </option>
+
+                                        {supportUsers.map(
+                                            user => (
+
+                                                <option
+                                                    key={
+                                                        user.id
+                                                    }
+                                                    value={
+                                                        user.id
+                                                    }
+                                                >
+                                                    {user.id} -{" "}
+                                                    {user.name}
+                                                </option>
+
+                                            )
+                                        )}
+
+                                    </select>
+
+                                </div>
+
+                                {/* CLIENT */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Client / Paying User *
+                                    </label>
+
+                                    <select
+                                        value={
+                                            supportClient
+                                        }
+                                        onChange={e =>
+                                            setSupportClient(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+
+                                        <option value="">
+                                            Select Customer
+                                        </option>
+
+                                        {customerUsers.map(
+                                            user => (
+
+                                                <option
+                                                    key={
+                                                        user.id
+                                                    }
+                                                    value={
+                                                        user.id
+                                                    }
+                                                >
+                                                    {user.id} -{" "}
+                                                    {user.name}
+                                                </option>
+
+                                            )
+                                        )}
+
+                                    </select>
+
+                                </div>
+
+                                {/* START DATE */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Support Start Date *
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={
+                                            supportStartDate
+                                        }
+                                        onChange={e =>
+                                            setSupportStartDate(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                                {/* END DATE */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Support End Date
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={
+                                            supportEndDate
+                                        }
+                                        onChange={e =>
+                                            setSupportEndDate(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                                {/* AGREED AMOUNT */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Agreed Amount *
+                                    </label>
+
+                                    <select
+                                        value={
+                                            agreedAmount
+                                        }
+                                        onChange={e =>
+                                            setAgreedAmount(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+
+                                        <option value="">
+                                            Select Amount
+                                        </option>
+
+                                        {amountOptions.map(
+                                            amount => (
+
+                                                <option
+                                                    key={
+                                                        amount
+                                                    }
+                                                    value={
+                                                        amount
+                                                    }
+                                                >
+                                                    ₹
+                                                    {Number(
+                                                        amount
+                                                    ).toLocaleString(
+                                                        "en-IN"
+                                                    )}
+                                                </option>
+
+                                            )
+                                        )}
+
+                                        <option value="custom">
+                                            Custom Amount
+                                        </option>
+
+                                    </select>
+
+                                    {agreedAmount ===
+                                        "custom" && (
+
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            step="0.01"
+                                            value={
+                                                customAgreedAmount
+                                            }
+                                            placeholder="Enter custom amount"
+                                            onChange={e =>
+                                                setCustomAgreedAmount(
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+
+                                    )}
+
+                                </div>
+
+                                {/* SUPPORT AGREED AMOUNT */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Support Agreed Amount *
+                                    </label>
+
+                                    <select
+                                        value={
+                                            supportAgreedAmount
+                                        }
+                                        onChange={e =>
+                                            setSupportAgreedAmount(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+
+                                        <option value="">
+                                            Select Amount
+                                        </option>
+
+                                        {amountOptions.map(
+                                            amount => (
+
+                                                <option
+                                                    key={
+                                                        amount
+                                                    }
+                                                    value={
+                                                        amount
+                                                    }
+                                                >
+                                                    ₹
+                                                    {Number(
+                                                        amount
+                                                    ).toLocaleString(
+                                                        "en-IN"
+                                                    )}
+                                                </option>
+
+                                            )
+                                        )}
+
+                                        <option value="custom">
+                                            Custom Amount
+                                        </option>
+
+                                    </select>
+
+                                    {supportAgreedAmount ===
+                                        "custom" && (
+
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            step="0.01"
+                                            value={
+                                                customSupportAgreedAmount
+                                            }
+                                            placeholder="Enter support agreed amount"
+                                            onChange={e =>
+                                                setCustomSupportAgreedAmount(
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+
+                                    )}
+
+                                </div>
+
+                                {/* SUPPORT PERIOD */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Support Period
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={
+                                            supportStartDate &&
+                                            supportEndDate
+                                                ? `${calculateSupportPeriodDays(
+                                                    supportStartDate,
+                                                    supportEndDate
+                                                )} Days`
+                                                : "Ongoing"
+                                        }
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <div className="form-actions">
+
+                                <button
+                                    type="submit"
+                                    className="primary-button"
+                                >
+                                    {editSupportId
+                                        ? "Update Support"
+                                        : "Add Support"}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="secondary-button"
+                                    onClick={
+                                        clearSupportForm
+                                    }
+                                >
+                                    Clear
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </section>
+                )}
+
+                {/* =================================================
+                    SUPPORT VIEW
+                ================================================= */}
+
+                {activeMenu === "supportView" && (
+
+                    <section className="support-view-card">
+
+                        <div className="support-view-header">
+
+                            <div>
+
+                                <span className="page-eyebrow">
+                                    TRACKING
+                                </span>
+
+                                <h1>
+                                    Support View
+                                </h1>
+
+                            </div>
+
+                            <div className="support-view-tools">
+
+                                <input
+                                    className="compact-search"
+                                    type="text"
+                                    placeholder="Search support, person, client..."
+                                    value={
+                                        searchSupport
+                                    }
+                                    onChange={e =>
+                                        setSearchSupport(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                {selectedSupportId && (
+
+                                    <div className="support-top-actions">
+
+                                        <button
+                                            onClick={() =>
+                                                openHistory(
+                                                    getSelectedSupport()
+                                                )
+                                            }
+                                        >
+                                            History
+                                        </button>
+
+                                        <button
+                                            onClick={() =>
+                                                editSupportRecord(
+                                                    getSelectedSupport()
+                                                )
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            className="danger-button"
+                                            onClick={() =>
+                                                setDeleteSupport(
+                                                    getSelectedSupport()
+                                                )
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </div>
+
+                                )}
+
+                            </div>
+
+                        </div>
+
+                        <div className="table-container">
+
+                            <table className="support-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Support ID
+                                        </th>
+
+                                        <th>
+                                            Support Person
+                                        </th>
+
+                                        <th>
+                                            Client / Paying User
+                                        </th>
+
+                                        <th>
+                                            Start Date
+                                        </th>
+
+                                        <th>
+                                            End Date
+                                        </th>
+
+                                        <th>
+                                            Agreed Amount
+                                        </th>
+
+                                        <th>
+                                            Support Agreed Amount
+                                        </th>
+
+                                        <th>
+                                            Amount Received
+                                        </th>
+
+                                        <th>
+                                            Paid to Support
+                                        </th>
+
+                                        <th>
+                                            Net Profit
+                                        </th>
+
+                                        <th>
+                                            Support Period
+                                        </th>
+
+                                        <th>
+                                            Last Payment Date
+                                        </th>
+
+                                        <th>
+                                            Next Due Date
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {filteredSupports.map(
+                                        support => {
+
+                                            const totals =
+                                                getPaymentTotals(
+                                                    support.id
+                                                );
+
+                                            const netProfit =
+                                                totals.received -
+                                                totals.paid;
+
+                                            const supportPerson =
+                                                users.find(
+                                                    user =>
+                                                        user.id ===
+                                                        support.assignedUser
+                                                );
+
+                                            const client =
+                                                users.find(
+                                                    user =>
+                                                        user.id ===
+                                                        support.client
+                                                );
+
+                                            return (
+
+                                                <tr
+                                                    key={
+                                                        support.id
+                                                    }
+                                                    onClick={() =>
+                                                        handleSupportRowClick(
+                                                            support
+                                                        )
+                                                    }
+                                                    className={`
+                                                        ${
+                                                            selectedSupportId ===
+                                                            support.id
+                                                                ? "selected-support-row"
+                                                                : ""
+                                                        }
+
+                                                        ${
+                                                            highlightedSupportId ===
+                                                            support.id
+                                                                ? "latest-support-row"
+                                                                : ""
+                                                        }
+                                                    `}
+                                                >
+
+                                                    <td>
+
+                                                        <span className="support-id-badge">
+                                                            {support.id}
+                                                        </span>
+
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            supportPerson?.name ||
+                                                            support.assignedUser
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            client?.name ||
+                                                            support.client
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            support.startDate
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            support.endDate ||
+                                                            "Ongoing"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+
+                                                        ₹{" "}
+                                                        {Number(
+                                                            support.agreedAmount
+                                                        ).toLocaleString(
+                                                            "en-IN"
+                                                        )}
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        ₹{" "}
+                                                        {Number(
+                                                            support.supportAgreedAmount ||
+                                                            0
+                                                        ).toLocaleString(
+                                                            "en-IN"
+                                                        )}
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        ₹{" "}
+                                                        {totals.received.toLocaleString(
+                                                            "en-IN"
+                                                        )}
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        ₹{" "}
+                                                        {totals.paid.toLocaleString(
+                                                            "en-IN"
+                                                        )}
+
+                                                    </td>
+
+                                                    <td>
+
+                                                        ₹{" "}
+                                                        {netProfit.toLocaleString(
+                                                            "en-IN"
+                                                        )}
+
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            support.supportPeriod
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            totals.lastPaymentDate ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            totals.nextDueDate ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                </tr>
+
+                                            );
+                                        }
+                                    )}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        {filteredSupports.length === 0 && (
+
+                            <div className="empty-state">
+                                No support assignments found.
+                            </div>
+
+                        )}
+
+                    </section>
+                )}
+
+                {/* =================================================
+                    CONTACT
+                ================================================= */}
+
+                {activeMenu === "contact" && (
+
+                    <section className="contact-card">
+
+                        <span className="page-eyebrow">
+                            SUPPORT
+                        </span>
+
+                        <h1>
+                            Contact
+                        </h1>
+
+                        <div className="contact-content">
+
+                            <div className="contact-item">
 
                                 <span>
-                                    Contact Number
+                                    Support Team
                                 </span>
 
                                 <strong>
-                                    {selectedUser.contact}
+                                    Support Management System
                                 </strong>
 
                             </div>
 
-
-                            <div className="detail-item">
+                            <div className="contact-item">
 
                                 <span>
                                     Email
                                 </span>
 
                                 <strong>
-                                    {selectedUser.email}
+                                    support@example.com
                                 </strong>
 
                             </div>
 
+                            <div className="contact-item">
 
-                            <div className="detail-item">
+                                <span>
+                                    Contact Number
+                                </span>
+
+                                <strong>
+                                    +91 00000 00000
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+                )}
+
+            </div>
+
+            {/* =================================================
+                SUCCESS TOAST
+            ================================================= */}
+
+            {successMessage && (
+
+                <div className="success-toast">
+
+                    <span>
+                        ✓
+                    </span>
+
+                    {successMessage}
+
+                </div>
+
+            )}
+
+            {/* =================================================
+                VIEW USER
+            ================================================= */}
+
+            {viewUser && (
+
+                <div
+                    className="modal-overlay"
+                    onClick={() =>
+                        setViewUser(null)
+                    }
+                >
+
+                    <div
+                        className="modal-card"
+                        onClick={e =>
+                            e.stopPropagation()
+                        }
+                    >
+
+                        <div className="modal-title">
+
+                            <div>
+
+                                <span className="page-eyebrow">
+                                    USER DETAILS
+                                </span>
+
+                                <h2>
+                                    {viewUser.name}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                        <div className="details-grid">
+
+                            <div>
+
+                                <span>
+                                    User ID
+                                </span>
+
+                                <strong>
+                                    {viewUser.id}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Type
+                                </span>
+
+                                <strong>
+                                    {viewUser.type}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Contact
+                                </span>
+
+                                <strong>
+                                    {viewUser.countryCode}{" "}
+                                    {viewUser.contact}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Email
+                                </span>
+
+                                <strong>
+                                    {viewUser.email}
+                                </strong>
+
+                            </div>
+
+                            <div>
 
                                 <span>
                                     Technology
                                 </span>
 
                                 <strong>
-                                    {selectedUser.technology}
-                                </strong>
-
-                            </div>
-
-
-                            <div className="detail-item">
-
-                                <span>
-                                    Time Zone
-                                </span>
-
-                                <strong>
-                                    {selectedUser.timeZone}
-                                </strong>
-
-                            </div>
-
-
-                            <div className="detail-item">
-
-                                <span>
-                                    Enrollment Date
-                                </span>
-
-                                <strong>
-                                    {selectedUser.enrollmentDate}
-                                </strong>
-
-                            </div>
-
-
-                            <div className="detail-item">
-
-                                <span>
-                                    Support Time
-                                </span>
-
-                                <strong>
-                                    {getDisplayTime(
-                                        selectedUser.startTime
+                                    {viewUser.technology?.join(
+                                        ", "
                                     )}
-                                    {" - "}
-                                    {getDisplayTime(
-                                        selectedUser.endTime
-                                    )}
+                                </strong>
+
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Registered Date
+                                </span>
+
+                                <strong>
+                                    {
+                                        viewUser.registeredDate
+                                    }
                                 </strong>
 
                             </div>
 
                         </div>
 
+                        <div className="confirm-actions">
 
-                        <button
-                            className="details-done-button"
-                            onClick={() =>
-                                setSelectedUser(null)
-                            }
-                        >
-                            Close
-                        </button>
+                            <button
+                                className="secondary-button"
+                                onClick={() =>
+                                    setViewUser(null)
+                                }
+                            >
+                                Close
+                            </button>
+
+                        </div>
 
                     </div>
 
                 </div>
             )}
 
-
-            {/* ================================
-                DELETE CONFIRMATION
-            ================================= */}
+            {/* =================================================
+                DELETE USER
+            ================================================= */}
 
             {deleteUser && (
 
-                <div className="delete-overlay">
+                <div className="modal-overlay">
 
-                    <div className="delete-card">
+                    <div className="modal-card confirm-card">
 
-                        <div className="delete-symbol">
+                        <span className="delete-icon">
                             !
-                        </div>
+                        </span>
 
                         <h2>
-                            Delete this user?
+                            Delete User?
                         </h2>
 
                         <p>
-                            You are about to delete this
-                            support user.
+                            Are you sure you want to
+                            delete{" "}
+                            <strong>
+                                {deleteUser.name}
+                            </strong>
+                            ?
                         </p>
 
-
-                        <div className="delete-user">
-
-                            <div className="avatar">
-                                {deleteUser.name
-                                    .charAt(0)
-                                    .toUpperCase()}
-                            </div>
-
-                            <div>
-
-                                <strong>
-                                    {deleteUser.name}
-                                </strong>
-
-                                <span>
-                                    {deleteUser.id}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div className="delete-details">
-
-                            <span>
-                                📧 {deleteUser.email}
-                            </span>
-
-                            <span>
-                                📱 {deleteUser.contact}
-                            </span>
-
-                        </div>
-
-
-                        <div className="delete-buttons">
+                        <div className="confirm-actions">
 
                             <button
+                                className="secondary-button"
                                 onClick={() =>
                                     setDeleteUser(null)
                                 }
@@ -1838,10 +3059,509 @@ function Support() {
                             </button>
 
                             <button
-                                className="confirm-delete"
-                                onClick={confirmDelete}
+                                className="danger-confirm"
+                                onClick={
+                                    confirmDeleteUser
+                                }
                             >
-                                Confirm Delete
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            )}
+
+            {/* =================================================
+                DELETE SUPPORT
+            ================================================= */}
+
+            {deleteSupport && (
+
+                <div className="modal-overlay">
+
+                    <div className="modal-card confirm-card">
+
+                        <span className="delete-icon">
+                            !
+                        </span>
+
+                        <h2>
+                            Delete Support?
+                        </h2>
+
+                        <p>
+                            Are you sure you want to
+                            delete Support{" "}
+                            <strong>
+                                {deleteSupport.id}
+                            </strong>
+                            ?
+                        </p>
+
+                        <div className="confirm-actions">
+
+                            <button
+                                className="secondary-button"
+                                onClick={() =>
+                                    setDeleteSupport(null)
+                                }
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                className="danger-confirm"
+                                onClick={
+                                    confirmDeleteSupport
+                                }
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            )}
+
+            {/* =================================================
+                HISTORY
+            ================================================= */}
+
+            {historySupport && (
+
+                <div className="modal-overlay">
+
+                    <div className="modal-card history-modal">
+
+                        <div className="modal-title">
+
+                            <div>
+
+                                <span className="page-eyebrow">
+                                    PAYMENT HISTORY
+                                </span>
+
+                                <h2>
+                                    Support{" "}
+                                    {historySupport.id}
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                        {(() => {
+
+                            const totals =
+                                getPaymentTotals(
+                                    historySupport.id
+                                );
+
+                            const balance =
+                                Number(
+                                    historySupport.agreedAmount
+                                ) -
+                                totals.received;
+
+                            return (
+
+                                <div className="history-summary">
+
+                                    <div>
+
+                                        <span>
+                                            Agreed Amount
+                                        </span>
+
+                                        <strong>
+                                            ₹{" "}
+                                            {Number(
+                                                historySupport.agreedAmount
+                                            ).toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Support Agreed Amount
+                                        </span>
+
+                                        <strong>
+                                            ₹{" "}
+                                            {Number(
+                                                historySupport.supportAgreedAmount ||
+                                                0
+                                            ).toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Amount Received
+                                        </span>
+
+                                        <strong>
+                                            ₹{" "}
+                                            {totals.received.toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Paid to Support
+                                        </span>
+
+                                        <strong>
+                                            ₹{" "}
+                                            {totals.paid.toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span>
+                                            Balance
+                                        </span>
+
+                                        <strong>
+                                            ₹{" "}
+                                            {balance.toLocaleString(
+                                                "en-IN"
+                                            )}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            );
+
+                        })()}
+
+                        <form
+                            className="payment-form"
+                            onSubmit={
+                                handleAddPayment
+                            }
+                        >
+
+                            <div className="payment-form-heading">
+
+                                <div>
+
+                                    <span className="page-eyebrow">
+                                        NEW PAYMENT
+                                    </span>
+
+                                    <h3>
+                                        Add Payment
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+                            <div className="payment-grid">
+
+                                <div className="field">
+
+                                    <label>
+                                        Amount Received
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={
+                                            paymentAmountReceived
+                                        }
+                                        placeholder="Enter received amount"
+                                        onChange={e =>
+                                            setPaymentAmountReceived(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                                <div className="field">
+
+                                    <label>
+                                        Received Date
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={
+                                            paymentReceivedDate
+                                        }
+                                        onChange={e =>
+                                            setPaymentReceivedDate(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                                <div className="field">
+
+                                    <label>
+                                        Amount Paid to Support
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={
+                                            paymentAmountPaid
+                                        }
+                                        placeholder="Enter paid amount"
+                                        onChange={e =>
+                                            setPaymentAmountPaid(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                                <div className="field">
+
+                                    <label>
+                                        Paid Date
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={
+                                            paymentPaidDate
+                                        }
+                                        onChange={e =>
+                                            setPaymentPaidDate(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                                <div className="field">
+
+                                    <label>
+                                        Next Due Date
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        readOnly
+                                        value={
+                                            calculateNextDueDate(
+                                                paymentReceivedDate ||
+                                                paymentPaidDate,
+                                                historySupport.supportPeriodDays
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                                <div className="field field-full">
+
+                                    <label>
+                                        Comments
+                                    </label>
+
+                                    <textarea
+                                        value={
+                                            paymentComments
+                                        }
+                                        placeholder="Enter payment comments"
+                                        onChange={e =>
+                                            setPaymentComments(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="primary-button"
+                            >
+                                Add Payment
+                            </button>
+
+                        </form>
+
+                        <div className="history-table-title">
+                            Payment Records
+                        </div>
+
+                        <div className="table-container">
+
+                            <table className="payment-table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Amount Received
+                                        </th>
+
+                                        <th>
+                                            Received Date
+                                        </th>
+
+                                        <th>
+                                            Amount Paid to Support
+                                        </th>
+
+                                        <th>
+                                            Paid Date
+                                        </th>
+
+                                        <th>
+                                            Next Due Date
+                                        </th>
+
+                                        <th>
+                                            Comments
+                                        </th>
+
+                                        <th>
+                                            Action
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    {payments
+                                        .filter(
+                                            payment =>
+                                                payment.supportId ===
+                                                historySupport.id
+                                        )
+                                        .map(
+                                            payment => (
+
+                                                <tr
+                                                    key={
+                                                        payment.id
+                                                    }
+                                                >
+
+                                                    <td>
+                                                        ₹{" "}
+                                                        {Number(
+                                                            payment.amountReceived
+                                                        ).toLocaleString(
+                                                            "en-IN"
+                                                        )}
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            payment.receivedDate ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        ₹{" "}
+                                                        {Number(
+                                                            payment.amountPaid
+                                                        ).toLocaleString(
+                                                            "en-IN"
+                                                        )}
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            payment.paidDate ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            payment.nextDueDate ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+                                                        {
+                                                            payment.comments ||
+                                                            "-"
+                                                        }
+                                                    </td>
+
+                                                    <td>
+
+                                                        <button
+                                                            className="danger-button"
+                                                            onClick={() =>
+                                                                deletePayment(
+                                                                    payment.id
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+
+                                                    </td>
+
+                                                </tr>
+
+                                            )
+                                        )}
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <div className="confirm-actions">
+
+                            <button
+                                className="secondary-button"
+                                onClick={() =>
+                                    setHistorySupport(null)
+                                }
+                            >
+                                Close
                             </button>
 
                         </div>
