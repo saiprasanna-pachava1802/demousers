@@ -22,7 +22,10 @@ function App() {
 
                 <Route path="/support" element={<Support />} />
 
-                <Route path="*" element={<Navigate to="/" />} />
+                <Route
+                    path="*"
+                    element={<Navigate to="/" />}
+                />
 
             </Routes>
 
