@@ -30,17 +30,25 @@ function Support() {
         "+1"
     ];
 
+    const statusOptions = [
+        "Active",
+        "On Hold",
+        "Completed",
+        "Cancelled"
+    ];
+
     // =====================================================
     // COMMON
     // =====================================================
 
-    const [activeMenu, setActiveMenu] = useState("home");
+    const [activeMenu, setActiveMenu] =
+        useState("home");
 
     const [successMessage, setSuccessMessage] =
         useState("");
 
     // =====================================================
-    // TECHNOLOGY
+    // TECHNOLOGIES
     // =====================================================
 
     const [technologies, setTechnologies] =
@@ -50,12 +58,14 @@ function Support() {
     // USERS
     // =====================================================
 
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] =
+        useState([]);
 
     const [nextUserNumber, setNextUserNumber] =
         useState(1);
 
-    const [name, setName] = useState("");
+    const [name, setName] =
+        useState("");
 
     const [userType, setUserType] =
         useState("");
@@ -108,6 +118,9 @@ function Support() {
 
     const [supportEndDate, setSupportEndDate] =
         useState("");
+
+    const [supportStatus, setSupportStatus] =
+        useState("Active");
 
     // Customer agreed amount
     const [agreedAmount, setAgreedAmount] =
@@ -165,6 +178,9 @@ function Support() {
     const [paymentComments, setPaymentComments] =
         useState("");
 
+    const [editPaymentId, setEditPaymentId] =
+        useState(null);
+
     // =====================================================
     // USER ID
     // =====================================================
@@ -196,7 +212,7 @@ function Support() {
     };
 
     // =====================================================
-    // DATE TIME
+    // REGISTERED DATE
     // =====================================================
 
     const getRegisteredDateTime = () => {
@@ -213,7 +229,7 @@ function Support() {
     };
 
     // =====================================================
-    // SUCCESS
+    // SUCCESS MESSAGE
     // =====================================================
 
     const showSuccess = (message) => {
@@ -749,6 +765,15 @@ function Support() {
             return false;
         }
 
+        if (!supportStatus) {
+
+            alert(
+                "Please select Status."
+            );
+
+            return false;
+        }
+
         const finalAmount =
             getFinalAgreedAmount();
 
@@ -794,6 +819,8 @@ function Support() {
         setAssignedSupportUser("");
         setSupportStartDate("");
         setSupportEndDate("");
+
+        setSupportStatus("Active");
 
         setAgreedAmount("");
         setCustomAgreedAmount("");
@@ -847,6 +874,9 @@ function Support() {
 
             endDate:
                 supportEndDate,
+
+            status:
+                supportStatus,
 
             agreedAmount:
                 finalAmount,
@@ -950,6 +980,10 @@ function Support() {
             support.endDate
         );
 
+        setSupportStatus(
+            support.status || "Active"
+        );
+
         setAgreedAmount(
             String(
                 support.agreedAmount || ""
@@ -972,7 +1006,6 @@ function Support() {
 
         setSelectedSupportId(null);
 
-        // Edit must return to Support page
         setActiveMenu("support");
     };
 
@@ -1030,6 +1063,9 @@ function Support() {
 
                             endDate:
                                 supportEndDate,
+
+                            status:
+                                supportStatus,
 
                             agreedAmount:
                                 finalAmount,
@@ -1134,6 +1170,12 @@ function Support() {
 
                     support.client
                         .toLowerCase()
+                        .includes(search)
+
+                    ||
+
+                    support.status
+                        ?.toLowerCase()
                         .includes(search)
 
                     ||
@@ -1260,6 +1302,8 @@ function Support() {
             support
         );
 
+        setEditPaymentId(null);
+
         setPaymentAmountReceived("");
         setPaymentReceivedDate("");
         setPaymentAmountPaid("");
@@ -1268,18 +1312,25 @@ function Support() {
     };
 
     // =====================================================
-    // ADD PAYMENT
+    // CLEAR PAYMENT FORM
     // =====================================================
 
-    const handleAddPayment = (
-        e
-    ) => {
+    const clearPaymentForm = () => {
 
-        e.preventDefault();
+        setPaymentAmountReceived("");
+        setPaymentReceivedDate("");
+        setPaymentAmountPaid("");
+        setPaymentPaidDate("");
+        setPaymentComments("");
 
-        if (!historySupport) {
-            return;
-        }
+        setEditPaymentId(null);
+    };
+
+    // =====================================================
+    // PAYMENT VALIDATION
+    // =====================================================
+
+    const validatePayment = () => {
 
         if (
             paymentAmountReceived === "" &&
@@ -1290,7 +1341,31 @@ function Support() {
                 "Please enter Amount Received or Amount Paid to Support."
             );
 
-            return;
+            return false;
+        }
+
+        if (
+            paymentAmountReceived !== "" &&
+            Number(paymentAmountReceived) < 0
+        ) {
+
+            alert(
+                "Amount Received cannot be negative."
+            );
+
+            return false;
+        }
+
+        if (
+            paymentAmountPaid !== "" &&
+            Number(paymentAmountPaid) < 0
+        ) {
+
+            alert(
+                "Amount Paid to Support cannot be negative."
+            );
+
+            return false;
         }
 
         if (
@@ -1302,7 +1377,7 @@ function Support() {
                 "Please select Received Date."
             );
 
-            return;
+            return false;
         }
 
         if (
@@ -1314,6 +1389,27 @@ function Support() {
                 "Please select Paid Date."
             );
 
+            return false;
+        }
+
+        return true;
+    };
+
+    // =====================================================
+    // ADD / UPDATE PAYMENT
+    // =====================================================
+
+    const handleSavePayment = (
+        e
+    ) => {
+
+        e.preventDefault();
+
+        if (!historySupport) {
+            return;
+        }
+
+        if (!validatePayment()) {
             return;
         }
 
@@ -1326,6 +1422,68 @@ function Support() {
                 paymentBaseDate,
                 historySupport.supportPeriodDays
             );
+
+        // =================================================
+        // UPDATE PAYMENT
+        // =================================================
+
+        if (editPaymentId) {
+
+            setPayments(
+                payments.map(
+                    payment => {
+
+                        if (
+                            payment.id ===
+                            editPaymentId
+                        ) {
+
+                            return {
+
+                                ...payment,
+
+                                amountReceived:
+                                    Number(
+                                        paymentAmountReceived
+                                    ) || 0,
+
+                                receivedDate:
+                                    paymentReceivedDate,
+
+                                amountPaid:
+                                    Number(
+                                        paymentAmountPaid
+                                    ) || 0,
+
+                                paidDate:
+                                    paymentPaidDate,
+
+                                nextDueDate,
+
+                                comments:
+                                    paymentComments
+                            };
+                        }
+
+                        return payment;
+                    }
+                )
+            );
+
+            setEditPaymentId(null);
+
+            clearPaymentForm();
+
+            showSuccess(
+                "Payment updated successfully."
+            );
+
+            return;
+        }
+
+        // =================================================
+        // ADD PAYMENT
+        // =================================================
 
         const newPayment = {
 
@@ -1387,14 +1545,47 @@ function Support() {
             )
         );
 
-        setPaymentAmountReceived("");
-        setPaymentReceivedDate("");
-        setPaymentAmountPaid("");
-        setPaymentPaidDate("");
-        setPaymentComments("");
+        clearPaymentForm();
 
         showSuccess(
             "Payment added successfully."
+        );
+    };
+
+    // =====================================================
+    // EDIT PAYMENT
+    // =====================================================
+
+    const editPayment = (
+        payment
+    ) => {
+
+        setPaymentAmountReceived(
+            String(
+                payment.amountReceived || ""
+            )
+        );
+
+        setPaymentReceivedDate(
+            payment.receivedDate || ""
+        );
+
+        setPaymentAmountPaid(
+            String(
+                payment.amountPaid || ""
+            )
+        );
+
+        setPaymentPaidDate(
+            payment.paidDate || ""
+        );
+
+        setPaymentComments(
+            payment.comments || ""
+        );
+
+        setEditPaymentId(
+            payment.id
         );
     };
 
@@ -1406,13 +1597,92 @@ function Support() {
         paymentId
     ) => {
 
-        setPayments(
+        const remainingPayments =
             payments.filter(
                 payment =>
                     payment.id !==
                     paymentId
-            )
+            );
+
+        setPayments(
+            remainingPayments
         );
+
+        if (historySupport) {
+
+            const supportPayments =
+                remainingPayments.filter(
+                    payment =>
+                        payment.supportId ===
+                        historySupport.id
+                );
+
+            const sortedPayments =
+                [...supportPayments].sort(
+                    (a, b) => {
+
+                        const dateA =
+                            new Date(
+                                a.receivedDate ||
+                                a.paidDate ||
+                                "1900-01-01"
+                            );
+
+                        const dateB =
+                            new Date(
+                                b.receivedDate ||
+                                b.paidDate ||
+                                "1900-01-01"
+                            );
+
+                        return dateB - dateA;
+                    }
+                );
+
+            const latestPayment =
+                sortedPayments[0];
+
+            setSupports(
+                supports.map(
+                    support => {
+
+                        if (
+                            support.id ===
+                            historySupport.id
+                        ) {
+
+                            return {
+
+                                ...support,
+
+                                lastPaymentDate:
+                                    latestPayment
+                                        ? (
+                                            latestPayment.receivedDate ||
+                                            latestPayment.paidDate
+                                        )
+                                        : "",
+
+                                nextDueDate:
+                                    latestPayment
+                                        ? latestPayment.nextDueDate
+                                        : ""
+                            };
+                        }
+
+                        return support;
+                    }
+                )
+            );
+        }
+
+        if (
+            editPaymentId ===
+            paymentId
+        ) {
+
+            clearPaymentForm();
+        }
 
         showSuccess(
             "Payment deleted successfully."
@@ -1588,8 +1858,6 @@ function Support() {
 
                             <div className="form-grid">
 
-                                {/* NAME */}
-
                                 <div className="field">
 
                                     <label>
@@ -1609,8 +1877,6 @@ function Support() {
                                     />
 
                                 </div>
-
-                                {/* TYPE */}
 
                                 <div className="field">
 
@@ -1643,8 +1909,6 @@ function Support() {
 
                                 </div>
 
-                                {/* CONTACT */}
-
                                 <div className="field">
 
                                     <label>
@@ -1669,16 +1933,10 @@ function Support() {
                                                 code => (
 
                                                     <option
-                                                        key={
-                                                            code
-                                                        }
-                                                        value={
-                                                            code
-                                                        }
+                                                        key={code}
+                                                        value={code}
                                                     >
-                                                        {
-                                                            code
-                                                        }
+                                                        {code}
                                                     </option>
 
                                                 )
@@ -1705,8 +1963,6 @@ function Support() {
 
                                 </div>
 
-                                {/* EMAIL */}
-
                                 <div className="field">
 
                                     <label>
@@ -1725,8 +1981,6 @@ function Support() {
                                     />
 
                                 </div>
-
-                                {/* TECHNOLOGY */}
 
                                 <div className="field">
 
@@ -1894,9 +2148,7 @@ function Support() {
                                 className="compact-search"
                                 type="text"
                                 placeholder="Search ID, name or email..."
-                                value={
-                                    searchUser
-                                }
+                                value={searchUser}
                                 onChange={e =>
                                     setSearchUser(
                                         e.target.value
@@ -2001,9 +2253,7 @@ function Support() {
                                         user => (
 
                                             <tr
-                                                key={
-                                                    user.id
-                                                }
+                                                key={user.id}
                                                 onClick={() =>
                                                     handleUserRowClick(
                                                         user
@@ -2045,10 +2295,8 @@ function Support() {
                                                 </td>
 
                                                 <td>
-
                                                     {user.countryCode}{" "}
                                                     {user.contact}
-
                                                 </td>
 
                                                 <td>
@@ -2116,19 +2364,15 @@ function Support() {
 
                         <div className="page-title-row">
 
-                            <div>
+                            <span className="page-eyebrow">
+                                SUPPORT
+                            </span>
 
-                                <span className="page-eyebrow">
-                                    SUPPORT
-                                </span>
-
-                                <h1>
-                                    {editSupportId
-                                        ? "Edit Support"
-                                        : "Support"}
-                                </h1>
-
-                            </div>
+                            <h1>
+                                {editSupportId
+                                    ? "Edit Support"
+                                    : "Support"}
+                            </h1>
 
                         </div>
 
@@ -2142,8 +2386,6 @@ function Support() {
                         >
 
                             <div className="support-form-grid">
-
-                                {/* SUPPORT PERSON */}
 
                                 <div className="field">
 
@@ -2170,12 +2412,8 @@ function Support() {
                                             user => (
 
                                                 <option
-                                                    key={
-                                                        user.id
-                                                    }
-                                                    value={
-                                                        user.id
-                                                    }
+                                                    key={user.id}
+                                                    value={user.id}
                                                 >
                                                     {user.id} -{" "}
                                                     {user.name}
@@ -2187,8 +2425,6 @@ function Support() {
                                     </select>
 
                                 </div>
-
-                                {/* CLIENT */}
 
                                 <div className="field">
 
@@ -2215,12 +2451,8 @@ function Support() {
                                             user => (
 
                                                 <option
-                                                    key={
-                                                        user.id
-                                                    }
-                                                    value={
-                                                        user.id
-                                                    }
+                                                    key={user.id}
+                                                    value={user.id}
                                                 >
                                                     {user.id} -{" "}
                                                     {user.name}
@@ -2232,8 +2464,6 @@ function Support() {
                                     </select>
 
                                 </div>
-
-                                {/* START DATE */}
 
                                 <div className="field">
 
@@ -2255,8 +2485,6 @@ function Support() {
 
                                 </div>
 
-                                {/* END DATE */}
-
                                 <div className="field">
 
                                     <label>
@@ -2274,6 +2502,46 @@ function Support() {
                                             )
                                         }
                                     />
+
+                                </div>
+
+                                {/* STATUS */}
+
+                                <div className="field">
+
+                                    <label>
+                                        Status *
+                                    </label>
+
+                                    <select
+                                        value={
+                                            supportStatus
+                                        }
+                                        onChange={e =>
+                                            setSupportStatus(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+
+                                        <option value="">
+                                            Select Status
+                                        </option>
+
+                                        {statusOptions.map(
+                                            status => (
+
+                                                <option
+                                                    key={status}
+                                                    value={status}
+                                                >
+                                                    {status}
+                                                </option>
+
+                                            )
+                                        )}
+
+                                    </select>
 
                                 </div>
 
@@ -2304,12 +2572,8 @@ function Support() {
                                             amount => (
 
                                                 <option
-                                                    key={
-                                                        amount
-                                                    }
-                                                    value={
-                                                        amount
-                                                    }
+                                                    key={amount}
+                                                    value={amount}
                                                 >
                                                     ₹
                                                     {Number(
@@ -2377,12 +2641,8 @@ function Support() {
                                             amount => (
 
                                                 <option
-                                                    key={
-                                                        amount
-                                                    }
-                                                    value={
-                                                        amount
-                                                    }
+                                                    key={amount}
+                                                    value={amount}
                                                 >
                                                     ₹
                                                     {Number(
@@ -2422,8 +2682,6 @@ function Support() {
                                     )}
 
                                 </div>
-
-                                {/* SUPPORT PERIOD */}
 
                                 <div className="field">
 
@@ -2579,6 +2837,10 @@ function Support() {
                                         </th>
 
                                         <th>
+                                            Status
+                                        </th>
+
+                                        <th>
                                             Start Date
                                         </th>
 
@@ -2698,6 +2960,27 @@ function Support() {
                                                             client?.name ||
                                                             support.client
                                                         }
+                                                    </td>
+
+                                                    <td>
+
+                                                        <span
+                                                            className={`status-badge status-${(
+                                                                support.status ||
+                                                                "Active"
+                                                            )
+                                                                .toLowerCase()
+                                                                .replace(
+                                                                    " ",
+                                                                    "-"
+                                                                )}`}
+                                                        >
+                                                            {
+                                                                support.status ||
+                                                                "Active"
+                                                            }
+                                                        </span>
+
                                                     </td>
 
                                                     <td>
@@ -2868,7 +3151,7 @@ function Support() {
             </div>
 
             {/* =================================================
-                SUCCESS TOAST
+                SUCCESS
             ================================================= */}
 
             {successMessage && (
@@ -3129,7 +3412,7 @@ function Support() {
             )}
 
             {/* =================================================
-                HISTORY
+                PAYMENT HISTORY
             ================================================= */}
 
             {historySupport && (
@@ -3258,10 +3541,12 @@ function Support() {
 
                         })()}
 
+                        {/* PAYMENT FORM */}
+
                         <form
                             className="payment-form"
                             onSubmit={
-                                handleAddPayment
+                                handleSavePayment
                             }
                         >
 
@@ -3270,11 +3555,15 @@ function Support() {
                                 <div>
 
                                     <span className="page-eyebrow">
-                                        NEW PAYMENT
+                                        {editPaymentId
+                                            ? "EDIT PAYMENT"
+                                            : "NEW PAYMENT"}
                                     </span>
 
                                     <h3>
-                                        Add Payment
+                                        {editPaymentId
+                                            ? "Edit Payment"
+                                            : "Add Payment"}
                                     </h3>
 
                                 </div>
@@ -3411,14 +3700,36 @@ function Support() {
 
                             </div>
 
-                            <button
-                                type="submit"
-                                className="primary-button"
-                            >
-                                Add Payment
-                            </button>
+                            <div className="payment-form-actions">
+
+                                <button
+                                    type="submit"
+                                    className="primary-button"
+                                >
+                                    {editPaymentId
+                                        ? "Update Payment"
+                                        : "Add Payment"}
+                                </button>
+
+                                {editPaymentId && (
+
+                                    <button
+                                        type="button"
+                                        className="secondary-button"
+                                        onClick={
+                                            clearPaymentForm
+                                        }
+                                    >
+                                        Cancel Edit
+                                    </button>
+
+                                )}
+
+                            </div>
 
                         </form>
+
+                        {/* PAYMENT RECORDS */}
 
                         <div className="history-table-title">
                             Payment Records
@@ -3529,16 +3840,31 @@ function Support() {
 
                                                     <td>
 
-                                                        <button
-                                                            className="danger-button"
-                                                            onClick={() =>
-                                                                deletePayment(
-                                                                    payment.id
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
+                                                        <div className="payment-actions">
+
+                                                            <button
+                                                                className="edit-payment-button"
+                                                                onClick={() =>
+                                                                    editPayment(
+                                                                        payment
+                                                                    )
+                                                                }
+                                                            >
+                                                                Edit
+                                                            </button>
+
+                                                            <button
+                                                                className="danger-button"
+                                                                onClick={() =>
+                                                                    deletePayment(
+                                                                        payment.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+
+                                                        </div>
 
                                                     </td>
 
@@ -3557,9 +3883,15 @@ function Support() {
 
                             <button
                                 className="secondary-button"
-                                onClick={() =>
-                                    setHistorySupport(null)
-                                }
+                                onClick={() => {
+
+                                    clearPaymentForm();
+
+                                    setHistorySupport(
+                                        null
+                                    );
+
+                                }}
                             >
                                 Close
                             </button>
