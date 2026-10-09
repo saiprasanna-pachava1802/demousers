@@ -1346,6 +1346,51 @@ tbody tr:last-child td {
     }
 }
 
+/* =====================================================
+   HOME DASHBOARD COUNTS
+===================================================== */
+
+.home-count-container {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    max-width: 650px;
+    margin-top: 30px;
+}
+
+.home-count-card {
+    flex: 1;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7ee;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(31, 41, 55, 0.07);
+}
+
+.home-count-card h3 {
+    margin: 0 0 14px;
+    color: #626a7a;
+    font-size: 16px;
+}
+
+.home-count-card h2 {
+    margin: 0;
+    color: #6257d9;
+    font-size: 32px;
+}
+
+@media (max-width: 600px) {
+    .home-count-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .home-count-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
 @media (max-width: 800px) {
 
     .form-grid,

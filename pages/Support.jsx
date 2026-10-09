@@ -1797,6 +1797,7 @@ function Support() {
 
             <div className="support-content">
 
+               ```jsx
                 {/* =================================================
                     HOME
                 ================================================= */}
@@ -1818,8 +1819,24 @@ function Support() {
                             and payment history from one place.
                         </p>
 
+                        <div className="home-count-container">
+
+                            <div className="home-count-card">
+                                <h3>No. of Users</h3>
+                                <h2>{users.length}</h2>
+                            </div>
+
+                            <div className="home-count-card">
+                                <h3>No. of Customers</h3>
+                                <h2>{customerUsers.length}</h2>
+                            </div>
+
+                        </div>
+
                     </section>
+
                 )}
+```
 
                 {/* =================================================
                     ADD USER
